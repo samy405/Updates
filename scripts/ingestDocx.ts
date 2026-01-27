@@ -37,6 +37,151 @@ function detectCategory(text: string): UpdateCategory {
 }
 
 /**
+ * Splits a block into sub-updates based on multiple heuristics:
+ * - Section headers (Title Case, ending with keywords)
+ * - Category keywords at line start
+ * - Bullet group boundaries
+ * - Topic shift keywords
+ * - Blank-line separation with topic changes
+ */
+function splitBlockIntoSubUpdates(block: string): string[] {
+  const subUpdates: string[] = [];
+  const lines = block.split("\n");
+  
+  // Find split points using multiple signals
+  const splitPoints: number[] = [0]; // Always start at beginning
+  
+  // Signal 1: Section headers (Title Case, short lines, ending with keywords)
+  const sectionHeaderPattern = /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s+(?:Changes?|Workflow|Update|Issues?|Process|Policy|Reminder|Note))?$/;
+  
+  // Signal 2: Category keywords at start of line
+  const categoryLinePattern = /^(?:Billing|Pharmacy|Labs?|Operations|Internal\s+Tools?|Compliance|Clinical|Video\s+Visit|Subscription|Employment|Cancellation|Refund|Payment|Charge|Invoice|Medication|Prescription|Lab\s+Order|Shipping|Refill):/i;
+  
+  // Signal 3: Strong topic shift keywords (new topic starting)
+  const topicShiftPatterns = [
+    /^-\s*(?:Billing|Pharmacy|Labs?|Operations|Subscription|Employment|Cancellation|Refund|Payment|Charge|Invoice|Medication|Prescription|Lab\s+Order|Shipping|Refill|Video\s+Visit)/i,
+    /^(?:When|If|For|Regarding|About)\s+(?:billing|pharmacy|labs?|subscription|payment|charge|invoice|medication|prescription|refill|shipping)/i,
+  ];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const prevLine = i > 0 ? lines[i - 1].trim() : "";
+    
+    let isSplitPoint = false;
+    
+    // Check for section header (short, Title Case, ends with keyword)
+    if (line.length > 5 && line.length < 80 && sectionHeaderPattern.test(line)) {
+      isSplitPoint = true;
+    }
+    
+    // Check for category keyword at line start
+    if (categoryLinePattern.test(line)) {
+      isSplitPoint = true;
+    }
+    
+    // Check for topic shift patterns
+    for (const pattern of topicShiftPatterns) {
+      if (pattern.test(line)) {
+        isSplitPoint = true;
+        break;
+      }
+    }
+    
+    // Check for bullet group boundary: blank line before, then new bullet with different topic
+    if (prevLine === "" && line.match(/^[\-\*•]\s+[A-Z]/)) {
+      // Check if this bullet starts a new topic (different category keywords)
+      const prevContext = lines.slice(Math.max(0, i - 10), i).join(" ").toLowerCase();
+      const nextContext = lines.slice(i, Math.min(lines.length, i + 10)).join(" ").toLowerCase();
+      
+      // Detect category shift
+      const prevCategory = detectCategory(prevContext);
+      const nextCategory = detectCategory(nextContext);
+      
+      if (prevCategory !== nextCategory && prevCategory !== "Miscellaneous" && nextCategory !== "Miscellaneous") {
+        isSplitPoint = true;
+      }
+    }
+    
+    // Check for blank-line separation with topic change
+    if (prevLine === "" && line.length > 10) {
+      const prevContext = lines.slice(Math.max(0, i - 15), i).join(" ").toLowerCase();
+      const nextContext = lines.slice(i, Math.min(lines.length, i + 15)).join(" ").toLowerCase();
+      
+      // Strong topic shift indicators
+      const prevHasBilling = /(?:billing|invoice|payment|charge|refund|subscription)/.test(prevContext);
+      const nextHasBilling = /(?:billing|invoice|payment|charge|refund|subscription)/.test(nextContext);
+      const prevHasPharmacy = /(?:pharmacy|medication|prescription|refill|shipping)/.test(prevContext);
+      const nextHasPharmacy = /(?:pharmacy|medication|prescription|refill|shipping)/.test(nextContext);
+      const prevHasLabs = /(?:lab|laboratory|test|results)/.test(prevContext);
+      const nextHasLabs = /(?:lab|laboratory|test|results)/.test(nextContext);
+      
+      if ((prevHasBilling && !nextHasBilling && (nextHasPharmacy || nextHasLabs)) ||
+          (prevHasPharmacy && !nextHasPharmacy && (nextHasBilling || nextHasLabs)) ||
+          (prevHasLabs && !nextHasLabs && (nextHasBilling || nextHasPharmacy))) {
+        isSplitPoint = true;
+      }
+    }
+    
+    if (isSplitPoint) {
+      splitPoints.push(i);
+    }
+  }
+  
+  splitPoints.push(lines.length); // Always end at the end
+  
+  // Remove duplicate split points
+  const uniqueSplitPoints = [...new Set(splitPoints)].sort((a, b) => a - b);
+  
+  // Extract sub-updates
+  for (let i = 0; i < uniqueSplitPoints.length - 1; i++) {
+    const start = uniqueSplitPoints[i];
+    const end = uniqueSplitPoints[i + 1];
+    const subUpdate = lines.slice(start, end).join("\n").trim();
+    
+    if (subUpdate.length > 30) { // Minimum length
+      subUpdates.push(subUpdate);
+    }
+  }
+  
+  return subUpdates.length > 0 ? subUpdates : [block]; // Fallback to original if no splits
+}
+
+/**
+ * Detects if a block likely contains multiple topics that should be split
+ */
+function detectMultipleTopics(block: string): boolean {
+  const lowerBlock = block.toLowerCase();
+  
+  // Count distinct category keywords
+  const categoryMatches: Set<UpdateCategory> = new Set();
+  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (category === "Miscellaneous") continue;
+    if (keywords.some((keyword) => lowerBlock.includes(keyword))) {
+      categoryMatches.add(category as UpdateCategory);
+    }
+  }
+  
+  // If multiple distinct categories detected, likely multiple topics
+  if (categoryMatches.size > 1) {
+    return true;
+  }
+  
+  // Check for section headers that suggest multiple topics
+  const sectionHeaders = block.match(/^[A-Z][^\n]{5,60}(?:Changes?|Workflow|Update|Issues?|Process|Policy)/gm);
+  if (sectionHeaders && sectionHeaders.length > 1) {
+    return true;
+  }
+  
+  // Check for category keywords at line starts
+  const categoryLineStarts = block.match(/^(?:Billing|Pharmacy|Labs?|Operations|Subscription|Employment|Cancellation):/gim);
+  if (categoryLineStarts && categoryLineStarts.length > 1) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
  * STRICT UPDATE DEFINITION:
  * A message qualifies ONLY if it introduces or changes:
  * 1) a rule or restriction
@@ -940,94 +1085,57 @@ async function ingestDocx(): Promise<void> {
     // Remove "end of update" text if it appears in the block
     block = block.replace(/\s*end\s+of\s+update\s*/gi, "").trim();
     
-    // Check if block contains multiple distinct updates (separated by clear section markers)
-    // Look for patterns like "-Employment Verification", "-Subscription Add Ons", etc.
-    // These indicate multiple updates that should be split
-    const sectionMarkerPattern = /(?:^|\n)\s*-\s*([A-Z][A-Za-z\s]{5,50})\s*(?:\n|$)/g;
-    const sectionMatches: { index: number; title: string }[] = [];
-    let sectionMatch;
+    // LEVEL 2: Split block into sub-updates if multiple topics detected
+    const hasMultipleTopics = detectMultipleTopics(block);
+    let subUpdates: string[] = [];
     
-    // Reset regex
-    sectionMarkerPattern.lastIndex = 0;
-    while ((sectionMatch = sectionMarkerPattern.exec(block)) !== null) {
-      const title = sectionMatch[1].trim();
-      // Only consider substantial section titles (not just "Updates" or "Reminders")
-      if (title.length > 5 && !/^(updates?|reminders?|notes?)$/i.test(title)) {
-        sectionMatches.push({
-          index: sectionMatch.index,
-          title: title,
-        });
-      }
-    }
-    
-    // If we found multiple distinct sections, split them into separate updates
-    const updateSections: string[] = [];
-    if (sectionMatches.length > 1) {
-      console.log(`Block ${blockIndex + 1} contains ${sectionMatches.length} distinct sections, splitting...`);
-      
-      // For the first section, include everything from the start of the block
-      // For subsequent sections, start from their marker
-      for (let i = 0; i < sectionMatches.length; i++) {
-        let sectionStart: number;
-        let sectionEnd: number;
-        
-        if (i === 0) {
-          // First section: include everything from block start to second section
-          sectionStart = 0;
-          sectionEnd = sectionMatches.length > 1 ? sectionMatches[1].index : block.length;
-        } else {
-          // Subsequent sections: start from their marker
-          sectionStart = sectionMatches[i].index;
-          sectionEnd = i < sectionMatches.length - 1 ? sectionMatches[i + 1].index : block.length;
-        }
-        
-        let sectionBlock = block.substring(sectionStart, sectionEnd).trim();
-        updateSections.push(sectionBlock);
-      }
+    if (hasMultipleTopics) {
+      console.log(`Block ${blockIndex + 1} contains multiple topics, splitting into sub-updates...`);
+      subUpdates = splitBlockIntoSubUpdates(block);
+      console.log(`  → Split into ${subUpdates.length} sub-update(s)`);
     } else {
-      // Single update block - use as-is
-      updateSections.push(block);
+      subUpdates = [block];
     }
     
-    // Process each section as a separate update
-    for (let sectionIndex = 0; sectionIndex < updateSections.length; sectionIndex++) {
-      let sectionBlock = updateSections[sectionIndex];
+    // Process each sub-update as a separate update record
+    for (let subIndex = 0; subIndex < subUpdates.length; subIndex++) {
+      let subUpdate = subUpdates[subIndex];
       
       // Preserve structure (paragraphs, bullets)
-      sectionBlock = preserveStructure(sectionBlock);
+      subUpdate = preserveStructure(subUpdate);
       
       // Remove Slack artifacts but preserve content structure
-      sectionBlock = cleanSlackText(sectionBlock);
+      subUpdate = cleanSlackText(subUpdate);
       
       // Remove non-update chatter (greetings, appreciation) but keep all instructions
-      sectionBlock = removeChatter(sectionBlock);
+      subUpdate = removeChatter(subUpdate);
       
-      if (sectionBlock.length < 30) {
-        console.warn(`Section ${sectionIndex + 1} of block ${blockIndex + 1} too short, skipping`);
+      if (subUpdate.length < 30) {
+        console.warn(`Section ${subIndex + 1} of block ${blockIndex + 1} too short, skipping`);
         continue;
       }
 
       // Validate update completeness
-      if (!validateUpdateCompleteness(sectionBlock)) {
-        console.warn(`Section ${sectionIndex + 1} of block ${blockIndex + 1} may be incomplete, but processing anyway`);
+      if (!validateUpdateCompleteness(subUpdate)) {
+        console.warn(`Section ${subIndex + 1} of block ${blockIndex + 1} may be incomplete, but processing anyway`);
       }
 
       // Check if this is actually an update
-      if (!isUpdate(sectionBlock)) {
-        console.log(`Section ${sectionIndex + 1} of block ${blockIndex + 1} does not qualify as update, skipping`);
+      if (!isUpdate(subUpdate)) {
+        console.log(`Section ${subIndex + 1} of block ${blockIndex + 1} does not qualify as update, skipping`);
         continue;
       }
 
-      const author = extractAuthor(sectionBlock);
-      const category = detectCategory(sectionBlock);
-      const title = extractTitle(sectionBlock, category);
+      const author = extractAuthor(subUpdate);
+      const category = detectCategory(subUpdate);
+      const title = extractTitle(subUpdate, category);
       
       // NO TRUNCATION - store full content
-      const body = sectionBlock; // Full content, never truncated
-      const sourceExcerpt = sectionBlock.length > 300 ? sectionBlock.substring(0, 300) + "..." : sectionBlock; // Only for display
+      const body = subUpdate; // Full content, never truncated
+      const sourceExcerpt = subUpdate.length > 300 ? subUpdate.substring(0, 300) + "..." : subUpdate; // Only for display
       
       const id = generateId(title, dateStr);
-      const supersedesIds = detectSupersedes(sectionBlock, existingUpdates);
+      const supersedesIds = detectSupersedes(subUpdate, existingUpdates);
 
       // Mark superseded updates
       for (const supersededId of supersedesIds) {
@@ -1053,7 +1161,7 @@ async function ingestDocx(): Promise<void> {
       };
 
       newUpdates.push(update);
-      console.log(`Extracted update: ${title} (${category}) - ${body.length} chars`);
+      console.log(`  ✓ Sub-update ${subIndex + 1}: "${title}" (${category}) - ${body.length} chars`);
     }
     
     if (associatedDate > (lastProcessedDate || new Date(0))) {
@@ -1108,7 +1216,18 @@ async function ingestDocx(): Promise<void> {
   console.log(`\n=== Ingestion Summary ===`);
   console.log(`Total updates in database: ${allUpdates.length}`);
   console.log(`New updates added: ${newUpdates.length}`);
-  console.log(`Updates written to: ${DATA_FILE}`);
+  
+  // Category breakdown
+  const categoryCounts: Record<string, number> = {};
+  for (const update of allUpdates) {
+    categoryCounts[update.category] = (categoryCounts[update.category] || 0) + 1;
+  }
+  console.log(`\nCategory breakdown:`);
+  for (const [category, count] of Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${category}: ${count}`);
+  }
+  
+  console.log(`\nUpdates written to: ${DATA_FILE}`);
   console.log(`Updates written to: ${DATA_FILE_SOURCE}`);
   
   // Write to both locations
