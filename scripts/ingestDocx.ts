@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 const DATA_FILE = path.join(__dirname, "../public/data/updates.json");
 const DATA_FILE_SOURCE = path.join(__dirname, "../data/updates.json");
-const DOCX_FILE = path.join(__dirname, "../CSupdates.docx");
+const DOCX_FILE = path.join(__dirname, "../CSupdates feeder.docx");
 
 // Priority authors
 const PRIORITY_AUTHORS = ["Jessica Booker", "Lindsay Burden", "Camryn Burden"];
@@ -58,6 +58,19 @@ function detectCategory(text: string): UpdateCategory {
 
 function isUpdate(text: string, author: string): boolean {
   const lowerText = text.toLowerCase();
+  const trimmed = text.trim();
+
+  // Skip obvious non-updates (but only if they're very short or don't contain update content)
+  const casualGreetings = /^(hi|hello|hey|thanks|thank you|ok|okay|sure|got it|will do)[\s\.!]*$/i;
+  if (casualGreetings.test(trimmed) && trimmed.length < 100) {
+    return false;
+  }
+
+  // Skip pure questions without update content
+  const pureQuestion = /^(can you|could you|would you|when will|how do|what is|where is)[\s\?]*$/i;
+  if (pureQuestion.test(trimmed) && trimmed.length < 150) {
+    return false;
+  }
 
   // Priority authors are always evaluated
   const isPriorityAuthor = PRIORITY_AUTHORS.some(
@@ -69,42 +82,63 @@ function isUpdate(text: string, author: string): boolean {
     lowerText.includes(indicator)
   );
 
-  // For priority authors, be more lenient
+  // Check for procedural/operational language
+  const proceduralKeywords = [
+    "process", "policy", "procedure", "workflow", "sop", "standard",
+    "effective", "implement", "rollout", "deploy", "change", "update",
+    "new", "now", "going forward", "starting", "beginning", "deprecate",
+    "fix", "error", "issue", "resolve", "solution", "steps", "instructions",
+  ];
+
+  const hasProceduralLanguage = proceduralKeywords.some((keyword) =>
+    lowerText.includes(keyword)
+  );
+
+  // For priority authors, be more lenient but still require substance
   if (isPriorityAuthor) {
-    return (
+    // Must have some substance (not just "update" or "change" alone)
+    const hasSubstance = lowerText.length > 50 || 
+      (hasIndicator && lowerText.length > 30) ||
+      (hasProceduralLanguage && lowerText.length > 40);
+    
+    return hasSubstance && (
       hasIndicator ||
-      lowerText.includes("new") ||
-      lowerText.includes("change") ||
-      lowerText.includes("update") ||
-      lowerText.includes("process") ||
-      lowerText.includes("policy")
+      hasProceduralLanguage ||
+      lowerText.includes("announce") ||
+      lowerText.includes("important")
     );
   }
 
-  // For others, require clear update language
+  // For others, require clear update language and official tone
   return (
-    hasIndicator ||
-    lowerText.includes("announcing") ||
-    lowerText.includes("effective") ||
-    lowerText.includes("going forward") ||
-    lowerText.includes("new process") ||
-    lowerText.includes("updated process")
+    (hasIndicator || hasProceduralLanguage) &&
+    (lowerText.includes("announcing") ||
+      lowerText.includes("effective") ||
+      lowerText.includes("going forward") ||
+      lowerText.includes("new process") ||
+      lowerText.includes("updated process") ||
+      lowerText.includes("official") ||
+      lowerText.includes("policy change"))
   );
 }
 
 function extractAuthor(text: string): string {
   // Common Slack paste formats:
-  // "Author Name [timestamp]" or "Author Name:" or "Author Name -"
+  // "Author Name [timestamp]" or "Author Name:" or "Author Name -" or "Author Name at 10:30 AM"
   const patterns = [
-    /^([A-Z][a-z]+ [A-Z][a-z]+)(?:\s*\[|\s*:|\s*-)/,
-    /^([A-Z][a-z]+ [A-Z][a-z]+)\s/,
-    /^([A-Z][a-z]+)\s/,
+    /^([A-Z][a-z]+ [A-Z][a-z]+)(?:\s*\[|\s*:|\s*-|\s+at\s+\d)/i,
+    /^([A-Z][a-z]+ [A-Z][a-z]+)\s/i,
+    /^([A-Z][a-z]+)\s/i,
+    // Try to match priority authors even if format is different
+    /(Jessica\s+Booker|Lindsay\s+Burden|Camryn\s+Burden)/i,
   ];
 
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match && match[1]) {
-      return match[1].trim();
+      const author = match[1].trim();
+      // Normalize spacing
+      return author.replace(/\s+/g, " ");
     }
   }
 
@@ -135,67 +169,107 @@ function generateId(title: string, datePosted: string): string {
 }
 
 function parseDateHeading(text: string): Date | null {
-  // Try to parse dates like "January 28, 2026" or "Jan 28, 2026"
-  const patterns = [
-    /([A-Z][a-z]+)\s+(\d{1,2}),\s+(\d{4})/,
-    /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-    /(\d{4})-(\d{1,2})-(\d{1,2})/,
-  ];
+  // Try to parse dates like "January 28, 2026" or "Jan 28, 2026" or "January 28, 2026" at start of line
+  const trimmed = text.trim();
+  
+  // Month abbreviations mapping
+  const monthMap: Record<string, number> = {
+    "january": 0, "jan": 0,
+    "february": 1, "feb": 1,
+    "march": 2, "mar": 2,
+    "april": 3, "apr": 3,
+    "may": 4,
+    "june": 5, "jun": 5,
+    "july": 6, "jul": 6,
+    "august": 7, "aug": 7,
+    "september": 8, "sep": 8, "sept": 8,
+    "october": 9, "oct": 9,
+    "november": 10, "nov": 10,
+    "december": 11, "dec": 11,
+  };
 
-  for (const pattern of patterns) {
-    const match = text.match(pattern);
-    if (match) {
-      if (pattern === patterns[0]) {
-        // Month name format
-        const monthNames = [
-          "january",
-          "february",
-          "march",
-          "april",
-          "may",
-          "june",
-          "july",
-          "august",
-          "september",
-          "october",
-          "november",
-          "december",
-        ];
-        const month = monthNames.indexOf(match[1].toLowerCase());
-        if (month !== -1) {
-          return new Date(
-            parseInt(match[3]),
-            month,
-            parseInt(match[2])
-          );
-        }
-      } else if (pattern === patterns[1]) {
-        // MM/DD/YYYY
-        return new Date(
-          parseInt(match[3]),
-          parseInt(match[1]) - 1,
-          parseInt(match[2])
-        );
-      } else {
-        // YYYY-MM-DD
-        return new Date(
-          parseInt(match[1]),
-          parseInt(match[2]) - 1,
-          parseInt(match[3])
-        );
+  // Pattern 1: "Wednesday 1/28:" or "Wednesday 1/28/26:" (day name followed by M/D or M/D/YY)
+  const dayNamePattern = /^[A-Z][a-z]+\s+(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s*:?/i;
+  const dayNameMatch = trimmed.match(dayNamePattern);
+  if (dayNameMatch) {
+    const month = parseInt(dayNameMatch[1]) - 1;
+    const day = parseInt(dayNameMatch[2]);
+    let year = dayNameMatch[3] ? parseInt(dayNameMatch[3]) : new Date().getFullYear();
+    
+    // Handle 2-digit years
+    if (year < 100) {
+      year = year < 50 ? 2000 + year : 1900 + year;
+    }
+    
+    if (year >= 2020 && year <= 2030 && month >= 0 && month <= 11 && day >= 1 && day <= 31) {
+      return new Date(year, month, day);
+    }
+  }
+
+  // Pattern 2: "January 28, 2026" or "Jan 28, 2026" (full month name or abbreviation)
+  const fullDatePattern = /^([A-Z][a-z]+)\s+(\d{1,2}),\s+(\d{4})/i;
+  const fullMatch = trimmed.match(fullDatePattern);
+  if (fullMatch) {
+    const monthName = fullMatch[1].toLowerCase();
+    const month = monthMap[monthName];
+    if (month !== undefined) {
+      const year = parseInt(fullMatch[3]);
+      const day = parseInt(fullMatch[2]);
+      // Validate date is reasonable (between 2020 and 2030)
+      if (year >= 2020 && year <= 2030 && day >= 1 && day <= 31) {
+        return new Date(year, month, day);
       }
     }
   }
+
+  // Pattern 3: MM/DD/YYYY or MM/DD/YY
+  const slashPattern = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/;
+  const slashMatch = trimmed.match(slashPattern);
+  if (slashMatch) {
+    const month = parseInt(slashMatch[1]) - 1;
+    const day = parseInt(slashMatch[2]);
+    let year = parseInt(slashMatch[3]);
+    
+    // Handle 2-digit years
+    if (year < 100) {
+      year = year < 50 ? 2000 + year : 1900 + year;
+    }
+    
+    if (year >= 2020 && year <= 2030 && month >= 0 && month <= 11 && day >= 1 && day <= 31) {
+      return new Date(year, month, day);
+    }
+  }
+
+  // Pattern 4: YYYY-MM-DD
+  const dashPattern = /^(\d{4})-(\d{1,2})-(\d{1,2})/;
+  const dashMatch = trimmed.match(dashPattern);
+  if (dashMatch) {
+    const year = parseInt(dashMatch[1]);
+    const month = parseInt(dashMatch[2]) - 1;
+    const day = parseInt(dashMatch[3]);
+    if (year >= 2020 && year <= 2030 && month >= 0 && month <= 11 && day >= 1 && day <= 31) {
+      return new Date(year, month, day);
+    }
+  }
+
   return null;
 }
 
 function extractTitle(body: string): string {
-  // Try to extract first sentence or first 60 chars
-  const firstSentence = body.match(/^[^.!?]+[.!?]/);
+  // Remove author name from start if present
+  let cleaned = body;
+  const authorPattern = /^[A-Z][a-z]+ [A-Z][a-z]+(?:\s+@channel)?\s*/;
+  cleaned = cleaned.replace(authorPattern, "");
+  
+  // Remove "replied to a thread:" prefix
+  cleaned = cleaned.replace(/^replied to a thread:\s*/i, "");
+  
+  // Try to extract first sentence or first 80 chars
+  const firstSentence = cleaned.match(/^[^.!?]+[.!?]/);
   if (firstSentence) {
     return firstSentence[0].trim().substring(0, 80);
   }
-  return body.substring(0, 80).trim() + (body.length > 80 ? "..." : "");
+  return cleaned.substring(0, 80).trim() + (cleaned.length > 80 ? "..." : "");
 }
 
 function detectSupersedes(
@@ -233,6 +307,10 @@ function detectSupersedes(
 
 async function ingestDocx(): Promise<void> {
   console.log("Reading DOCX file...");
+  if (!fs.existsSync(DOCX_FILE)) {
+    console.error(`DOCX file not found at: ${DOCX_FILE}`);
+    process.exit(1);
+  }
   const result = await mammoth.extractRawText({ path: DOCX_FILE });
   const text = result.value;
 
@@ -296,12 +374,25 @@ async function ingestDocx(): Promise<void> {
     }
 
     // Process messages in this section
-    const messages = section.content.join("\n").split(/\n(?=[A-Z][a-z]+)/);
-    // Also split by common message separators
+    // Join all content and split by common message patterns
+    const fullContent = section.content.join("\n");
+    
+    // Split by patterns that indicate new messages:
+    // - Double newlines
+    // - Lines starting with capitalized names (likely author names)
+    // - Lines with timestamps
+    const messageSplits = fullContent.split(/\n\n+/);
     const allMessages: string[] = [];
-    for (const msg of messages) {
-      const split = msg.split(/(?:\n\n|\n(?=[A-Z][a-z]+ [A-Z][a-z]+))/);
-      allMessages.push(...split);
+    
+    for (const chunk of messageSplits) {
+      // Further split by author name patterns
+      const subMessages = chunk.split(/\n(?=[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?(?:\s*[:\[\-]|\s+at\s+\d))/);
+      for (const msg of subMessages) {
+        const trimmed = msg.trim();
+        if (trimmed.length > 0) {
+          allMessages.push(trimmed);
+        }
+      }
     }
 
     for (const message of allMessages) {
@@ -315,8 +406,10 @@ async function ingestDocx(): Promise<void> {
 
       const category = detectCategory(cleaned);
       const title = extractTitle(cleaned);
-      const body = cleaned.substring(0, 500); // First 500 chars as body
-      const sourceExcerpt = cleaned.substring(0, 200); // First 200 chars as excerpt
+      
+      // Use full cleaned text as body, but limit to reasonable length
+      const body = cleaned.length > 1000 ? cleaned.substring(0, 1000) + "..." : cleaned;
+      const sourceExcerpt = cleaned.length > 250 ? cleaned.substring(0, 250) + "..." : cleaned;
       const id = generateId(title, dateStr);
       const supersedesIds = detectSupersedes(cleaned, existingUpdates);
 
