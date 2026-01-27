@@ -114,100 +114,7 @@ function isUpdate(text: string): boolean {
   return hasSubstantiveChange && !isStatusOnly;
 }
 
-/**
- * Extract only update-worthy portions from mixed messages
- * Returns array of update-worthy text segments
- */
-function extractUpdatePortions(text: string): string[] {
-  const updates: string[] = [];
-
-  // Look for bullet points with updates
-  const bulletPattern = /[\-\*•]\s*([A-Z][^\n]{20,200})/g;
-  let bulletMatchResult;
-  while ((bulletMatchResult = bulletPattern.exec(text)) !== null) {
-    const bulletText = bulletMatchResult[1].trim();
-    if (isUpdate(bulletText)) {
-      updates.push(bulletText);
-    }
-  }
-
-  // Look for sections marked as "UPDATES" or "CHANGES"
-  const updateSectionPattern = /(?:updates?|changes?)[\s:]+([\s\S]{50,1000})/i;
-  const sectionMatch = text.match(updateSectionPattern);
-  if (sectionMatch) {
-    const sectionText = sectionMatch[1];
-    // Split by bullets, dashes, or double newlines and check each
-    const parts = sectionText.split(/(?:[\n\-]|•|\*)/).filter(p => p.trim().length > 20);
-    for (const part of parts) {
-      const trimmed = part.trim();
-      if (isUpdate(trimmed)) {
-        updates.push(trimmed);
-      }
-    }
-  }
-  
-  // Look for specific distinct update patterns that should be split
-  // "All video visits standardized" pattern
-  const videoVisitMatch = text.match(/(All\s+video\s+visits[^\n]{10,200})/i);
-  if (videoVisitMatch && videoVisitMatch.index !== undefined && isUpdate(videoVisitMatch[1])) {
-    const videoText = text.substring(Math.max(0, videoVisitMatch.index - 5), Math.min(text.length, videoVisitMatch.index + videoVisitMatch[0].length + 50)).trim();
-    if (!updates.some(u => u.toLowerCase().includes("video visit"))) {
-      updates.push(videoText);
-    }
-  }
-  
-  // "Medication & Treatment Change Workflow" pattern
-  const medicationWorkflowMatch = text.match(/(Medication[^\n]{20,300}(?:workflow|process|routed|deferred))/i);
-  if (medicationWorkflowMatch && medicationWorkflowMatch.index !== undefined && isUpdate(medicationWorkflowMatch[1])) {
-    const medText = text.substring(Math.max(0, medicationWorkflowMatch.index - 5), Math.min(text.length, medicationWorkflowMatch.index + medicationWorkflowMatch[0].length + 50)).trim();
-    if (!updates.some(u => u.toLowerCase().includes("medication") && u.toLowerCase().includes("rn"))) {
-      updates.push(medText);
-    }
-  }
-
-  // If no structured sections found, check if entire message is an update
-  if (updates.length === 0 && isUpdate(text)) {
-    // Check if message contains multiple distinct updates (e.g., "Video visits standardized... Medication change...")
-    // Look for distinct update patterns separated by newlines or bullets
-    const distinctPatterns = [
-      /(?:^|\n)([A-Z][^\n]{30,200}(?:standardized|routed|restricted|prohibited|required|deferred|no longer|must|should|please))/g,
-      /(?:^|\n)(All\s+video\s+visits[^\n]{10,100})/gi,
-      /(?:^|\n)(Medication[^\n]{20,150})/gi,
-      /(?:^|\n)(Employment\s+verification[^\n]{10,100})/gi,
-      /(?:^|\n)(Cancellation[^\n]{20,150})/gi,
-    ];
-    
-    const foundUpdates = new Set<string>();
-    for (const pattern of distinctPatterns) {
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
-        const segment = match[1].trim();
-        if (segment.length > 30 && isUpdate(segment) && !foundUpdates.has(segment)) {
-          foundUpdates.add(segment);
-          updates.push(segment);
-        }
-      }
-    }
-    
-    // If we found multiple distinct updates, return them
-    if (updates.length > 1) {
-      return updates;
-    }
-    
-    // Otherwise, try to extract the core update sentence
-    const sentences = text.split(/[.!?]+/).filter(s => {
-      const trimmed = s.trim();
-      return trimmed.length > 30 && isUpdate(trimmed);
-    });
-    if (sentences.length > 0) {
-      updates.push(...sentences.map(s => s.trim()));
-    } else {
-      updates.push(text);
-    }
-  }
-
-  return updates;
-}
+// NOTE: extractUpdatePortions function removed - we now use "end of update" delimiter for splitting
 
 function extractAuthor(text: string): string {
   // Common Slack paste formats:
@@ -240,9 +147,13 @@ function cleanSlackText(text: string): string {
   cleaned = cleaned.replace(/:\w+:\s*\(\d+\)/g, "");
   // Remove thread indicators
   cleaned = cleaned.replace(/^Thread:/gi, "");
-  // Clean up multiple spaces
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
-  return cleaned;
+  // Normalize whitespace but preserve paragraph breaks (double newlines)
+  cleaned = cleaned.replace(/[ \t]+/g, " "); // Collapse spaces/tabs
+  cleaned = cleaned.replace(/\n[ \t]+/g, "\n"); // Remove leading spaces on lines
+  cleaned = cleaned.replace(/[ \t]+\n/g, "\n"); // Remove trailing spaces on lines
+  // Preserve double newlines (paragraph breaks)
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n"); // Max 2 newlines
+  return cleaned.trim();
 }
 
 function generateId(title: string, datePosted: string): string {
@@ -803,6 +714,118 @@ function detectSupersedes(
   return supersedesIds;
 }
 
+/**
+ * Preserves paragraph structure and bullet points while normalizing whitespace
+ */
+function preserveStructure(text: string): string {
+  // Normalize line breaks: preserve double newlines (paragraph breaks), collapse single newlines within paragraphs
+  let normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  
+  // Preserve bullet points and numbered lists
+  // First, mark bullet lines
+  const lines = normalized.split("\n");
+  const preserved: string[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    // Empty lines become single newline (paragraph separator)
+    if (trimmed.length === 0) {
+      if (preserved.length > 0 && preserved[preserved.length - 1] !== "\n") {
+        preserved.push("\n");
+      }
+      continue;
+    }
+    
+    // Bullet or numbered list item - preserve as-is
+    if (/^[\-\*•]\s+/.test(trimmed) || /^\d+[\.\)]\s+/.test(trimmed)) {
+      preserved.push(trimmed);
+      continue;
+    }
+    
+    // Regular line - trim but preserve
+    preserved.push(trimmed);
+  }
+  
+  // Join with single newlines, but preserve double newlines for paragraphs
+  return preserved.join("\n").replace(/\n\n+/g, "\n\n").trim();
+}
+
+/**
+ * Validates that an update doesn't end mid-sentence or mid-word
+ */
+function validateUpdateCompleteness(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return false;
+  
+  // Check for incomplete endings
+  const incompleteEndings = /\b(please|and|to|if|when|then|but|or|with|for|from|by|at|in|on|the|a|an)$/i;
+  if (incompleteEndings.test(trimmed)) {
+    return false;
+  }
+  
+  // Check if ends with proper punctuation or is a complete thought
+  if (/[.!?]$/.test(trimmed)) {
+    return true;
+  }
+  
+  // If ends with colon, it might be a heading - acceptable
+  if (/:$/.test(trimmed)) {
+    return true;
+  }
+  
+  // If ends with a complete word (not cut off), it's probably okay
+  // But prefer sentences ending with punctuation
+  const lastWord = trimmed.split(/\s+/).pop() || "";
+  if (lastWord.length > 2 && !/[.!?]$/.test(trimmed)) {
+    // Warn but don't fail - might be intentional
+    return true;
+  }
+  
+  return true; // Default to accepting
+}
+
+/**
+ * Removes non-update chatter (greetings, appreciation) while preserving instructions
+ */
+function removeChatter(text: string): string {
+  const lines = text.split("\n");
+  const cleaned: string[] = [];
+  let foundUpdateContent = false;
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) {
+      if (foundUpdateContent) {
+        cleaned.push("");
+      }
+      continue;
+    }
+    
+    // Skip pure greetings/appreciation at the start
+    if (!foundUpdateContent) {
+      if (/^(hi|hello|hey|thanks|thank you|appreciate|great job)[\s\.!]*$/i.test(trimmed)) {
+        continue;
+      }
+      if (/^(just checking|just wanting|just following up)[\s\.]*$/i.test(trimmed)) {
+        continue;
+      }
+    }
+    
+    // Once we find real content, keep everything
+    if (trimmed.length > 10 && !/^(hi|hello|hey|thanks|thank you)[\s\.!]*$/i.test(trimmed)) {
+      foundUpdateContent = true;
+    }
+    
+    if (foundUpdateContent || trimmed.length > 5) {
+      cleaned.push(trimmed);
+    }
+  }
+  
+  return cleaned.join("\n").trim();
+}
+
 async function ingestDocx(): Promise<void> {
   console.log("Reading DOCX file...");
   if (!fs.existsSync(DOCX_FILE)) {
@@ -810,11 +833,10 @@ async function ingestDocx(): Promise<void> {
     process.exit(1);
   }
   const result = await mammoth.extractRawText({ path: DOCX_FILE });
-  const text = result.value;
+  const rawText = result.value;
 
   console.log("Loading existing updates...");
   let existingData: UpdatesData;
-  // Check both locations (public for runtime, data for source)
   const sourceFile = fs.existsSync(DATA_FILE_SOURCE) ? DATA_FILE_SOURCE : DATA_FILE;
   if (fs.existsSync(sourceFile)) {
     const fileContent = fs.readFileSync(sourceFile, "utf-8");
@@ -824,157 +846,240 @@ async function ingestDocx(): Promise<void> {
   }
 
   const existingUpdates = existingData.updates;
-  const existingDateStrings = new Set(
-    existingUpdates.map((u) => u.datePosted)
-  );
 
-  // Split by date headings
-  const lines = text.split(/\n/);
-  const sections: { date: Date; content: string[] }[] = [];
-  let currentDate: Date | null = null;
-  let currentContent: string[] = [];
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    const date = parseDateHeading(trimmed);
+  // STEP 1: Extract date headings and their positions
+  const lines = rawText.split(/\n/);
+  const dateHeadings: { date: Date; lineIndex: number }[] = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const date = parseDateHeading(lines[i].trim());
     if (date) {
-      // Save previous section
-      if (currentDate) {
-        sections.push({ date: currentDate, content: currentContent });
-      }
-      // Start new section
-      currentDate = date;
-      currentContent = [];
-    } else if (currentDate) {
-      currentContent.push(trimmed);
+      dateHeadings.push({ date, lineIndex: i });
     }
   }
 
-  // Save last section
-  if (currentDate) {
-    sections.push({ date: currentDate, content: currentContent });
-  }
+  console.log(`Found ${dateHeadings.length} date headings`);
 
-  console.log(`Found ${sections.length} date sections`);
+  // STEP 2: Split by "end of update" delimiter (case-insensitive)
+  // Try multiple patterns to catch variations
+  const endOfUpdatePatterns = [
+    /\n\s*end\s+of\s+update\s*\n/gi,
+    /\n\s*end\s+of\s+update\s*$/gim,
+    /end\s+of\s+update\s*\n/gi,
+    /END\s+OF\s+UPDATE/gi,
+  ];
+  
+  let updateBlocks: string[] = [];
+  let workingText = rawText;
+  
+  // Try each pattern
+  for (const pattern of endOfUpdatePatterns) {
+    const matches = workingText.match(pattern);
+    if (matches && matches.length > 0) {
+      console.log(`Found ${matches.length} "end of update" delimiters using pattern`);
+      updateBlocks = workingText.split(pattern);
+      break;
+    }
+  }
+  
+  // If no delimiters found, check if document might not use them
+  if (updateBlocks.length === 0 || (updateBlocks.length === 1 && updateBlocks[0].trim().length > 0)) {
+    console.warn("No 'end of update' delimiters found. Document may not use this format.");
+    console.warn("Falling back to date-section-based splitting (legacy mode)");
+    // Fall back to legacy behavior - split by date sections only
+    updateBlocks = [rawText];
+  }
+  
+  console.log(`Processing ${updateBlocks.length} update blocks`);
 
   const newUpdates: Update[] = [];
   let lastProcessedDate: Date | null = null;
 
-  for (const section of sections) {
-    const dateStr = section.date.toISOString().split("T")[0];
+  // STEP 3: Process each update block
+  for (let blockIndex = 0; blockIndex < updateBlocks.length; blockIndex++) {
+    let block = updateBlocks[blockIndex].trim();
+    if (block.length === 0) continue;
 
-    // Skip if already processed
-    if (existingDateStrings.has(dateStr)) {
-      console.log(`Skipping already processed date: ${dateStr}`);
+    // Find the nearest preceding date heading
+    // Calculate approximate line index of this block
+    let blockStartPos = 0;
+    for (let i = 0; i < blockIndex; i++) {
+      blockStartPos += updateBlocks[i].length;
+      if (i < updateBlocks.length - 1) {
+        // Add length of "end of update" delimiter (approximate)
+        blockStartPos += 20;
+      }
+    }
+    const blockStartLine = rawText.substring(0, blockStartPos).split("\n").length - 1;
+    let associatedDate: Date | null = null;
+    
+    for (let i = dateHeadings.length - 1; i >= 0; i--) {
+      if (dateHeadings[i].lineIndex <= blockStartLine) {
+        associatedDate = dateHeadings[i].date;
+        break;
+      }
+    }
+    
+    if (!associatedDate) {
+      console.warn(`Update block ${blockIndex + 1} has no associated date, skipping`);
       continue;
     }
 
-    // Process messages in this section
-    // Join all content and split by common message patterns
-    const fullContent = section.content.join("\n");
+    const dateStr = associatedDate.toISOString().split("T")[0];
+
+    // Remove date headings from the block content
+    block = block.split("\n").filter(line => !parseDateHeading(line.trim())).join("\n").trim();
     
-    // Split by patterns that indicate new messages:
-    // - Double newlines
-    // - Lines starting with capitalized names (likely author names)
-    // - Lines with timestamps
-    const messageSplits = fullContent.split(/\n\n+/);
-    const allMessages: string[] = [];
+    // Remove "end of update" text if it appears in the block
+    block = block.replace(/\s*end\s+of\s+update\s*/gi, "").trim();
     
-    for (const chunk of messageSplits) {
-      // Further split by author name patterns
-      const subMessages = chunk.split(/\n(?=[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?(?:\s*[:\[\-]|\s+at\s+\d))/);
-      for (const msg of subMessages) {
-        const trimmed = msg.trim();
-        if (trimmed.length > 0) {
-          allMessages.push(trimmed);
-        }
+    // Check if block contains multiple distinct updates (separated by clear section markers)
+    // Look for patterns like "-Employment Verification", "-Subscription Add Ons", etc.
+    // These indicate multiple updates that should be split
+    const sectionMarkerPattern = /(?:^|\n)\s*-\s*([A-Z][A-Za-z\s]{5,50})\s*(?:\n|$)/g;
+    const sectionMatches: { index: number; title: string }[] = [];
+    let sectionMatch;
+    
+    // Reset regex
+    sectionMarkerPattern.lastIndex = 0;
+    while ((sectionMatch = sectionMarkerPattern.exec(block)) !== null) {
+      const title = sectionMatch[1].trim();
+      // Only consider substantial section titles (not just "Updates" or "Reminders")
+      if (title.length > 5 && !/^(updates?|reminders?|notes?)$/i.test(title)) {
+        sectionMatches.push({
+          index: sectionMatch.index,
+          title: title,
+        });
       }
     }
-
-    for (const message of allMessages) {
-      const cleaned = cleanSlackText(message);
-      if (cleaned.length < 20) continue; // Skip very short messages
-
-      const author = extractAuthor(cleaned);
+    
+    // If we found multiple distinct sections, split them into separate updates
+    const updateSections: string[] = [];
+    if (sectionMatches.length > 1) {
+      console.log(`Block ${blockIndex + 1} contains ${sectionMatches.length} distinct sections, splitting...`);
       
-      // Extract only update-worthy portions from mixed messages
-      const updatePortions = extractUpdatePortions(cleaned);
-      
-      if (updatePortions.length === 0) {
-        continue; // Skip messages with no update-worthy content
-      }
-
-      // Process each update portion separately
-      for (const portion of updatePortions) {
-        const portionCleaned = cleanSlackText(portion);
-        if (portionCleaned.length < 30) continue; // Skip very short portions
-
-        // Re-check if this portion is actually an update
-        if (!isUpdate(portionCleaned)) {
-          continue;
-        }
-
-        const category = detectCategory(portionCleaned);
-        const title = extractTitle(portionCleaned, category);
+      // For the first section, include everything from the start of the block
+      // For subsequent sections, start from their marker
+      for (let i = 0; i < sectionMatches.length; i++) {
+        let sectionStart: number;
+        let sectionEnd: number;
         
-        // Use the portion as body, but limit to reasonable length
-        const body = portionCleaned.length > 1000 ? portionCleaned.substring(0, 1000) + "..." : portionCleaned;
-        const sourceExcerpt = portionCleaned.length > 250 ? portionCleaned.substring(0, 250) + "..." : portionCleaned;
-        const id = generateId(title, dateStr);
-        const supersedesIds = detectSupersedes(portionCleaned, existingUpdates);
-
-        // Mark superseded updates
-        for (const supersededId of supersedesIds) {
-          const supersededUpdate = existingUpdates.find(
-            (u) => u.id === supersededId
-          );
-          if (supersededUpdate) {
-            supersededUpdate.status = "superseded";
-            supersededUpdate.supersededById = id;
-          }
+        if (i === 0) {
+          // First section: include everything from block start to second section
+          sectionStart = 0;
+          sectionEnd = sectionMatches.length > 1 ? sectionMatches[1].index : block.length;
+        } else {
+          // Subsequent sections: start from their marker
+          sectionStart = sectionMatches[i].index;
+          sectionEnd = i < sectionMatches.length - 1 ? sectionMatches[i + 1].index : block.length;
         }
+        
+        let sectionBlock = block.substring(sectionStart, sectionEnd).trim();
+        updateSections.push(sectionBlock);
+      }
+    } else {
+      // Single update block - use as-is
+      updateSections.push(block);
+    }
+    
+    // Process each section as a separate update
+    for (let sectionIndex = 0; sectionIndex < updateSections.length; sectionIndex++) {
+      let sectionBlock = updateSections[sectionIndex];
+      
+      // Preserve structure (paragraphs, bullets)
+      sectionBlock = preserveStructure(sectionBlock);
+      
+      // Remove Slack artifacts but preserve content structure
+      sectionBlock = cleanSlackText(sectionBlock);
+      
+      // Remove non-update chatter (greetings, appreciation) but keep all instructions
+      sectionBlock = removeChatter(sectionBlock);
+      
+      if (sectionBlock.length < 30) {
+        console.warn(`Section ${sectionIndex + 1} of block ${blockIndex + 1} too short, skipping`);
+        continue;
+      }
 
-        const update: Update = {
-          id,
-          datePosted: dateStr,
-          author,
-          category,
-          title,
-          body,
-          sourceExcerpt,
-          supersedesIds,
-          supersededById: null,
-          status: "active",
-          needsAnswer: false,
-        };
+      // Validate update completeness
+      if (!validateUpdateCompleteness(sectionBlock)) {
+        console.warn(`Section ${sectionIndex + 1} of block ${blockIndex + 1} may be incomplete, but processing anyway`);
+      }
 
-        newUpdates.push(update);
-        console.log(`Extracted update: ${title} (${category})`);
+      // Check if this is actually an update
+      if (!isUpdate(sectionBlock)) {
+        console.log(`Section ${sectionIndex + 1} of block ${blockIndex + 1} does not qualify as update, skipping`);
+        continue;
+      }
+
+      const author = extractAuthor(sectionBlock);
+      const category = detectCategory(sectionBlock);
+      const title = extractTitle(sectionBlock, category);
+      
+      // NO TRUNCATION - store full content
+      const body = sectionBlock; // Full content, never truncated
+      const sourceExcerpt = sectionBlock.length > 300 ? sectionBlock.substring(0, 300) + "..." : sectionBlock; // Only for display
+      
+      const id = generateId(title, dateStr);
+      const supersedesIds = detectSupersedes(sectionBlock, existingUpdates);
+
+      // Mark superseded updates
+      for (const supersededId of supersedesIds) {
+        const supersededUpdate = existingUpdates.find((u) => u.id === supersededId);
+        if (supersededUpdate) {
+          supersededUpdate.status = "superseded";
+          supersededUpdate.supersededById = id;
+        }
+      }
+
+      const update: Update = {
+        id,
+        datePosted: dateStr,
+        author,
+        category,
+        title,
+        body, // Full content, never truncated
+        sourceExcerpt,
+        supersedesIds,
+        supersededById: null,
+        status: "active",
+        needsAnswer: false,
+      };
+
+      newUpdates.push(update);
+      console.log(`Extracted update: ${title} (${category}) - ${body.length} chars`);
+    }
+    
+    if (associatedDate > (lastProcessedDate || new Date(0))) {
+      lastProcessedDate = associatedDate;
+    }
+  }
+
+  // For full re-ingestion, replace all existing updates
+  // Otherwise, merge new with existing
+  const shouldReplaceAll = process.env.REINGEST_ALL === "true" || newUpdates.length > 0;
+  
+  let allUpdates: Update[];
+  if (shouldReplaceAll && newUpdates.length > 0) {
+    // Replace all updates from dates we're processing
+    const processedDates = new Set(newUpdates.map(u => u.datePosted));
+    const keptUpdates = existingUpdates.filter(u => !processedDates.has(u.datePosted));
+    allUpdates = [...keptUpdates, ...newUpdates];
+    console.log(`Replaced updates for ${processedDates.size} date(s), kept ${keptUpdates.length} existing updates`);
+  } else {
+    // Merge new with existing, deduplicate
+    const seenTitles = new Set<string>();
+    const deduplicatedNew: Update[] = [];
+    for (const update of newUpdates) {
+      const titleKey = `${update.datePosted}-${update.title.toLowerCase().trim()}`;
+      if (!seenTitles.has(titleKey)) {
+        seenTitles.add(titleKey);
+        deduplicatedNew.push(update);
+      } else {
+        console.log(`Skipping duplicate: ${update.title}`);
       }
     }
-
-    if (section.date > (lastProcessedDate || new Date(0))) {
-      lastProcessedDate = section.date;
-    }
+    allUpdates = [...existingUpdates, ...deduplicatedNew];
   }
-
-  // Merge new updates with existing
-  // Deduplicate by title and date (keep first occurrence)
-  const seenTitles = new Set<string>();
-  const deduplicatedNew: Update[] = [];
-  for (const update of newUpdates) {
-    const titleKey = `${update.datePosted}-${update.title.toLowerCase().trim()}`;
-    if (!seenTitles.has(titleKey)) {
-      seenTitles.add(titleKey);
-      deduplicatedNew.push(update);
-    } else {
-      console.log(`Skipping duplicate: ${update.title}`);
-    }
-  }
-  
-  const allUpdates = [...existingUpdates, ...deduplicatedNew];
 
   // Update lastIngestedDate
   const finalLastDate =
