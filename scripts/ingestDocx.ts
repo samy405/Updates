@@ -13,27 +13,145 @@ const DOCX_FILE = path.join(__dirname, "../CSupdates feeder.docx");
 
 // Note: Priority authors and update indicators removed - using strict definition only
 
-// Category keywords mapping
-const CATEGORY_KEYWORDS: Record<UpdateCategory, string[]> = {
-  Pharmacy: ["pharmacy", "medication", "prescription", "rx", "drug"],
-  Billing: ["billing", "invoice", "payment", "charge", "cost", "fee"],
-  Labs: ["lab", "laboratory", "test", "results", "specimen"],
-  Operations: ["operation", "workflow", "process", "procedure", "sop"],
-  "Internal Tools / Systems": ["tool", "system", "platform", "software", "app", "dashboard"],
-  "Contractor / Staffing": ["contractor", "staffing", "staff", "hire", "onboard"],
-  "Compliance / Clinical": ["compliance", "clinical", "regulation", "policy", "protocol"],
+// Category keywords mapping with weights (weight: number)
+type KeywordWeight = [string, number];
+const CATEGORY_KEYWORDS: Record<UpdateCategory, KeywordWeight[]> = {
+  Billing: [
+    ["subscription", 3], ["renewal", 3], ["charge", 3], ["invoice", 3], ["payment", 3],
+    ["failed payment", 3], ["refund", 3], ["billing cycle", 4], ["12-week", 2], ["48-week", 2],
+    ["plan", 2], ["coupon", 2], ["credit", 2], ["proration", 3], ["billing", 4],
+    ["cost", 2], ["fee", 2], ["stripe", 2], ["charge date", 3], ["void payment", 3],
+    ["delay charge", 3], ["pricing", 2], ["rate", 2], ["$199", 2], ["$499", 2], ["$1799", 2],
+  ],
+  Pharmacy: [
+    ["pharmacy", 4], ["medication", 3], ["refill", 4], ["shipment", 3], ["shipping", 3],
+    ["tracking", 3], ["rx", 2], ["prescription", 3], ["dose", 2], ["vial", 2],
+    ["injection", 2], ["cream", 2], ["anastrozole", 3], ["tadalafil", 3], ["enclomiphene", 3],
+    ["belmar", 4], ["curexa", 4], ["pharmacy hub", 4], ["drug", 2], ["unodose", 2],
+    ["tcream", 3], ["dispenser", 2], ["overnight shipping", 3], ["expedited shipping", 3],
+  ],
+  Labs: [
+    ["labcorp", 4], ["quest", 4], ["getlabs", 4], ["bloodwork", 3], ["lab order", 3],
+    ["results", 2], ["draw", 2], ["appointment", 2], ["requisition", 3], ["lab", 3],
+    ["laboratory", 3], ["test", 2], ["specimen", 2], ["scheduling link", 3], ["lab scheduling", 3],
+    ["no labs", 2], ["pilot program", 2], ["$35", 2], ["lab fee", 3],
+  ],
+  "Internal Tools / Systems": [
+    ["intercom", 3], ["slack", 2], ["asana", 3], ["zendesk", 3], ["tech_cs", 3],
+    ["tech cs", 3], ["bug", 2], ["outage", 3], ["dashboard", 2], ["link generator", 3],
+    ["scheduling link", 3], ["integration", 3], ["tool", 2], ["system", 2], ["platform", 2],
+    ["software", 2], ["app", 2], ["routing error", 3], ["tech", 2], ["error", 2],
+  ],
+  Operations: [
+    ["sop", 3], ["workflow", 3], ["process", 3], ["escalation", 3], ["triage", 2],
+    ["routing", 2], ["policy change", 3], ["effective immediately", 3], ["operation", 2],
+    ["procedure", 2], ["standardized", 3], ["standardization", 3], ["reassign", 2],
+    ["defer", 2], ["shift supervisor", 3], ["ss team", 3], ["ma team", 3], ["rn team", 3],
+    ["going forward", 2], ["new process", 3], ["updated process", 3],
+  ],
+  "Contractor / Staffing": [
+    ["schedule", 2], ["ooo", 3], ["contractor", 4], ["coverage", 3], ["shift", 2],
+    ["staffing", 3], ["time added", 2], ["staff", 2], ["hire", 2], ["onboard", 2],
+  ],
+  "Compliance / Clinical": [
+    ["rn team", 3], ["provider", 2], ["clinical", 3], ["contraindication", 3], ["safety", 3],
+    ["adverse", 3], ["hipaa", 4], ["authorization", 3], ["verification", 3], ["compliance", 3],
+    ["regulation", 2], ["policy", 2], ["protocol", 2], ["employment verification", 3],
+    ["3rd party", 2], ["family member", 2], ["translator", 2], ["translation", 2],
+  ],
   Miscellaneous: [],
 };
 
-function detectCategory(text: string): UpdateCategory {
-  const lowerText = text.toLowerCase();
+// Minimum score threshold for category assignment
+const MIN_CATEGORY_SCORE = 4;
+// Confidence ratio: top score must be at least this multiple of second score
+const CONFIDENCE_RATIO = 1.3;
+// Topic purity threshold: if second score is >= this ratio of top score, it's mixed
+const TOPIC_PURITY_THRESHOLD = 0.75;
+
+interface CategoryScore {
+  category: UpdateCategory;
+  score: number;
+}
+
+/**
+ * Classifies text into a category using weighted keyword scoring
+ * Returns the category and top 2 scores for analysis
+ */
+function classifyWithScores(text: string): { category: UpdateCategory; scores: CategoryScore[] } {
+  // Normalize text: lowercase, preserve word boundaries
+  const normalized = text.toLowerCase()
+    .replace(/[^\w\s-]/g, " ") // Replace punctuation with spaces
+    .replace(/\s+/g, " ") // Normalize whitespace
+    .trim();
+  
+  const scores: CategoryScore[] = [];
+  
+  // Score each category
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (category === "Miscellaneous") continue;
-    if (keywords.some((keyword) => lowerText.includes(keyword))) {
-      return category as UpdateCategory;
+    if (category === "Miscellaneous") {
+      scores.push({ category: category as UpdateCategory, score: 0 });
+      continue;
+    }
+    
+    let categoryScore = 0;
+    for (const [keyword, weight] of keywords) {
+      // Check for exact phrase match (case-insensitive)
+      const regex = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+      if (regex.test(normalized)) {
+        categoryScore += weight;
+      }
+    }
+    
+    scores.push({ category: category as UpdateCategory, score: categoryScore });
+  }
+  
+  // Sort by score descending
+  scores.sort((a, b) => b.score - a.score);
+  
+  const topScore = scores[0].score;
+  const secondScore = scores[1]?.score || 0;
+  
+  // Determine category
+  let chosenCategory: UpdateCategory = "Miscellaneous";
+  
+  if (topScore >= MIN_CATEGORY_SCORE) {
+    // Check confidence: top score must be significantly higher than second
+    if (secondScore === 0 || topScore >= secondScore * CONFIDENCE_RATIO) {
+      chosenCategory = scores[0].category;
+    } else {
+      // Scores are too close - mark as mixed (will be handled by topic purity check)
+      chosenCategory = scores[0].category; // Still assign top, but purity check will catch it
     }
   }
-  return "Miscellaneous";
+  
+  return {
+    category: chosenCategory,
+    scores: scores.slice(0, 3), // Return top 3 for debugging
+  };
+}
+
+/**
+ * Classifies text into a category (simplified interface for existing code)
+ */
+function detectCategory(text: string): UpdateCategory {
+  return classifyWithScores(text).category;
+}
+
+/**
+ * Checks if a sub-update is mixed (contains multiple strong topics)
+ */
+function isMixedTopic(text: string): boolean {
+  const { scores } = classifyWithScores(text);
+  const topScore = scores[0].score;
+  const secondScore = scores[1]?.score || 0;
+  
+  // Mixed if both top scores are above threshold and second is close to top
+  return (
+    topScore >= MIN_CATEGORY_SCORE &&
+    secondScore >= MIN_CATEGORY_SCORE &&
+    secondScore >= topScore * TOPIC_PURITY_THRESHOLD
+  );
 }
 
 /**
@@ -147,22 +265,89 @@ function splitBlockIntoSubUpdates(block: string): string[] {
 }
 
 /**
- * Detects if a block likely contains multiple topics that should be split
+ * Splits a mixed sub-update further to achieve topic purity
  */
-function detectMultipleTopics(block: string): boolean {
-  const lowerBlock = block.toLowerCase();
+function splitMixedSubUpdate(text: string): string[] {
+  const parts: string[] = [];
+  const lines = text.split("\n");
   
-  // Count distinct category keywords
-  const categoryMatches: Set<UpdateCategory> = new Set();
-  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (category === "Miscellaneous") continue;
-    if (keywords.some((keyword) => lowerBlock.includes(keyword))) {
-      categoryMatches.add(category as UpdateCategory);
+  // Strategy 1: Split by blank lines (paragraph boundaries)
+  const blankLineSplits: number[] = [0];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === "" && i > 0 && i < lines.length - 1) {
+      // Check if previous and next lines are substantial
+      const prevSubstantial = lines[i - 1].trim().length > 10;
+      const nextSubstantial = lines[i + 1].trim().length > 10;
+      if (prevSubstantial && nextSubstantial) {
+        blankLineSplits.push(i);
+      }
+    }
+  }
+  blankLineSplits.push(lines.length);
+  
+  // Strategy 2: Split by category label cues
+  const categoryLabelPattern = /^(?:Billing|Pharmacy|Labs?|Operations|Internal\s+Tools?|Compliance|Clinical|Subscription|Employment|Cancellation|Refund|Payment|Charge|Invoice|Medication|Prescription|Lab\s+Order|Shipping|Refill|LabCorp|Quest|GetLabs|Belmar|Curexa):/i;
+  const labelSplits: number[] = [0];
+  for (let i = 0; i < lines.length; i++) {
+    if (categoryLabelPattern.test(lines[i])) {
+      labelSplits.push(i);
+    }
+  }
+  labelSplits.push(lines.length);
+  
+  // Strategy 3: Split by heading-like lines
+  const headingPattern = /^[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s+(?:Changes?|Workflow|Update|Issues?|Process|Policy|Reminder|Note))?$/;
+  const headingSplits: number[] = [0];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.length > 5 && line.length < 80 && headingPattern.test(line)) {
+      headingSplits.push(i);
+    }
+  }
+  headingSplits.push(lines.length);
+  
+  // Strategy 4: Split by bullet group boundaries
+  const bulletSplits: number[] = [0];
+  let lastBulletIndex = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^[\-\*•]\s+/.test(lines[i])) {
+      if (lastBulletIndex >= 0 && i - lastBulletIndex > 3) {
+        // Gap between bullet groups
+        bulletSplits.push(i);
+      }
+      lastBulletIndex = i;
+    }
+  }
+  bulletSplits.push(lines.length);
+  
+  // Combine all split points and use the most granular
+  const allSplits = [...new Set([...blankLineSplits, ...labelSplits, ...headingSplits, ...bulletSplits])].sort((a, b) => a - b);
+  
+  // Extract parts
+  for (let i = 0; i < allSplits.length - 1; i++) {
+    const start = allSplits[i];
+    const end = allSplits[i + 1];
+    const part = lines.slice(start, end).join("\n").trim();
+    
+    if (part.length > 30) {
+      parts.push(part);
     }
   }
   
-  // If multiple distinct categories detected, likely multiple topics
-  if (categoryMatches.size > 1) {
+  return parts.length > 1 ? parts : [text]; // Fallback to original if no splits
+}
+
+/**
+ * Detects if a block likely contains multiple topics that should be split
+ */
+function detectMultipleTopics(block: string): boolean {
+  // Use scoring system to detect multiple topics
+  const { scores } = classifyWithScores(block);
+  const topScore = scores[0].score;
+  const secondScore = scores[1]?.score || 0;
+  
+  // If multiple categories score well, likely multiple topics
+  if (topScore >= MIN_CATEGORY_SCORE && secondScore >= MIN_CATEGORY_SCORE) {
     return true;
   }
   
@@ -173,7 +358,7 @@ function detectMultipleTopics(block: string): boolean {
   }
   
   // Check for category keywords at line starts
-  const categoryLineStarts = block.match(/^(?:Billing|Pharmacy|Labs?|Operations|Subscription|Employment|Cancellation):/gim);
+  const categoryLineStarts = block.match(/^(?:Billing|Pharmacy|Labs?|Operations|Subscription|Employment|Cancellation|Refund|Payment|Charge|Invoice|Medication|Prescription|Lab\s+Order|Shipping|Refill):/gim);
   if (categoryLineStarts && categoryLineStarts.length > 1) {
     return true;
   }
@@ -1126,8 +1311,70 @@ async function ingestDocx(): Promise<void> {
         continue;
       }
 
+      // TOPIC PURITY CHECK: If sub-update is mixed, split it further
+      if (isMixedTopic(subUpdate)) {
+        console.log(`  ⚠️  Sub-update ${subIndex + 1} is MIXED (multiple strong topics), splitting further...`);
+        const mixedParts = splitMixedSubUpdate(subUpdate);
+        console.log(`     → Split into ${mixedParts.length} parts`);
+        
+        // Process each part as a separate update
+        for (let partIndex = 0; partIndex < mixedParts.length; partIndex++) {
+          let part = mixedParts[partIndex];
+          part = preserveStructure(part);
+          part = cleanSlackText(part);
+          part = removeChatter(part);
+          
+          if (part.length < 30 || !isUpdate(part)) {
+            continue;
+          }
+          
+          const author = extractAuthor(part);
+          const classification = classifyWithScores(part);
+          const category = classification.category;
+          const title = extractTitle(part, category);
+          
+          const body = part;
+          const sourceExcerpt = part.length > 300 ? part.substring(0, 300) + "..." : part;
+          const id = generateId(title, dateStr);
+          const supersedesIds = detectSupersedes(part, existingUpdates);
+          
+          // Mark superseded updates
+          for (const supersededId of supersedesIds) {
+            const supersededUpdate = existingUpdates.find((u) => u.id === supersededId);
+            if (supersededUpdate) {
+              supersededUpdate.status = "superseded";
+              supersededUpdate.supersededById = id;
+            }
+          }
+          
+          const update: Update = {
+            id,
+            datePosted: dateStr,
+            author,
+            category,
+            title,
+            body,
+            sourceExcerpt,
+            supersedesIds,
+            supersededById: null,
+            status: "active",
+            needsAnswer: false,
+          };
+          
+          newUpdates.push(update);
+          
+          // Debug output: show scores
+          const top2Scores = classification.scores.slice(0, 2);
+          const scoreStr = top2Scores.map(s => `${s.category} ${s.score}`).join(", ");
+          console.log(`     ✓ Part ${partIndex + 1}: "${title}" (${category}) [${scoreStr}] - ${body.length} chars`);
+        }
+        continue; // Skip processing the original mixed sub-update
+      }
+      
+      // Single-topic sub-update: process normally
       const author = extractAuthor(subUpdate);
-      const category = detectCategory(subUpdate);
+      const classification = classifyWithScores(subUpdate);
+      const category = classification.category;
       const title = extractTitle(subUpdate, category);
       
       // NO TRUNCATION - store full content
@@ -1161,7 +1408,11 @@ async function ingestDocx(): Promise<void> {
       };
 
       newUpdates.push(update);
-      console.log(`  ✓ Sub-update ${subIndex + 1}: "${title}" (${category}) - ${body.length} chars`);
+      
+      // Debug output: show scores
+      const top2Scores = classification.scores.slice(0, 2);
+      const scoreStr = top2Scores.map(s => `${s.category} ${s.score}`).join(", ");
+      console.log(`  ✓ Sub-update ${subIndex + 1}: "${title}" (${category}) [${scoreStr}] - ${body.length} chars`);
     }
     
     if (associatedDate > (lastProcessedDate || new Date(0))) {

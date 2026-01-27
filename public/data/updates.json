@@ -1,19 +1,6 @@
 {
   "updates": [
     {
-      "id": "20260128-lab-scheduling-link-during-error",
-      "datePosted": "2026-01-28",
-      "author": "Unknown",
-      "category": "Labs",
-      "title": "Lab scheduling link during error",
-      "body": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that the link is good for 48hrs. We might see uptick in questions and evaluations. We cannot honor the promo outside of 48 hours.\n\nIf you are unsure how to handle any questions regarding this, please send to the SS.\n\nWe want to instruct the patient's to refer to the price given on their specific check out.\n\nThe discounted price will be provided when patient's utilize the link provided within 48 hours of retrieval.\n\nIf patient's are upset about this timeframe we cannot make adjustments. Once again we should direct them to what is reflected in their personal check out.\n\n-Lab links during Holiday\n\nLab scheduling is rarely successful on major holidays and for this reason Lab bookings will be prevented on those days. This will hopefully help reduce the influx of error reports we get for lab booking on our major Holiday's.\n\nIf a patient is having an issue with the lab scheduling link during a major holiday please prompt the patient to try again after.\n\nIf the issue persists after the holiday, the patient should notify us.\n\n-Lab scheduling link issues\n\nWhen issues occur for lab scheduling please do the following:\n\nVerify lab scheduling is not working on our end and not just the patients\n\nIf it is not working, then this indicates the issue is not specific to the patient, and tech should be notified.\n\nPlease send message to Tech_CS channel.\n\nSend message to the patient letting them know our tech has been notified.\n\nSnooze ticket to follow up on the matter next day.\n\nIf Tech has not provided any updates attempt to utilize the link.\n\nIf it works please notify the patient to proceed.\n\nIf it does not work continue to snooze until tech provides an update or we see resolution on our end.\n\n-Patient states they did not agree to auto renewing subscription\n\nThe following macros have been updated for if a patient messages in stating they did not agree to an auto renewing subscription. These include an image of the terms each patient agrees to when they sign up for the associated HRT/TRT subscription. Here are the macro titles:\n\nPatient states they did not sign up for auto renewing subscription at a rate of $199 every 4 weeks\n\nPatient states they did not sign up for auto renewing subscription at a rate of $499 every 12 weeks\n\nPatient states they did not sign up for auto renewing subscription at a rate of $1799 every 48 weeks\n\nPlease let me know if you have any questions!",
-      "sourceExcerpt": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that the link is good for...",
-      "supersedesIds": [],
-      "supersededById": null,
-      "status": "active",
-      "needsAnswer": false
-    },
-    {
       "id": "20260128-a-routing-error",
       "datePosted": "2026-01-28",
       "author": "Unknown",
@@ -22,13 +9,12 @@
       "body": "@channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of the issue. Thank you!\n\n-\n\n@channel Important reminders and updates. Please give a thumbs up when you have reviewed the following:",
       "sourceExcerpt": "@channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of the issue. Thank you!\n\n-\n\n@channel Important reminders and updates...",
       "supersedesIds": [
-        "20260128-lab-scheduling-link-issue",
+        "20260128-lab-scheduling-link-during-error",
         "20260128-a-routing-error",
         "20260128-progesterone-sublingual-300-mg-no-longer-offered",
-        "20260128-requests-routed-to-shift-supervisor",
         "20260128-billing-process-update",
         "20260128-lab-process-update",
-        "20260128-pharmacy-process-update",
+        "20260128-requests-routed-to-shift-supervisor",
         "20260128-pharmacy-process-update"
       ],
       "supersededById": null,
@@ -43,10 +29,7 @@
       "title": "Progesterone sublingual 300 mg no longer offered",
       "body": "Good morning @channel. We have some Updates and Reminders for the day. Please review.\n\nUPDATES\n\n-Sublingual Progesterone 300mg\n\nWe will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients will be receiving a blast message letting them know about the change.\n\nIf a patient has any additional questions from the message they receive, please defer to the SS team\n\n-HRT Labs not required for specific patients\n\nWe have successfully been seeing New York HRT patients with no labs for several weeks now. We are going to broaden the pilot program to several other patients in different states.\n\nPlease ALWAYS first check to see if a lab order was generated.\n\nIf no lab order was generated, that means they are part of our no labs pilot program. Please do not offer labs to these patients.",
       "sourceExcerpt": "Good morning @channel. We have some Updates and Reminders for the day. Please review.\n\nUPDATES\n\n-Sublingual Progesterone 300mg\n\nWe will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients will be receiving a blast message letting them know about t...",
-      "supersedesIds": [
-        "20260128-existing-patient-price-change-process",
-        "20260128-pharmacy-process-update"
-      ],
+      "supersedesIds": [],
       "supersededById": null,
       "status": "active",
       "needsAnswer": false
@@ -81,7 +64,7 @@
       "id": "20260128-requests-routed-to-shift-supervisor",
       "datePosted": "2026-01-28",
       "author": "CS does",
-      "category": "Pharmacy",
+      "category": "Billing",
       "title": "Requests routed to shift supervisor",
       "body": "CS does not need to process cancellation in stripe. Once reason for cancellation request has been provided by the patient, send the matter to Shift Supervisor team. They will proceed with cancellation if appropriate.\n\n*** Remember if a patient states they would like a refund, please specify that a refund was requested. ***\n\n-Existing Patients Requesting new prices\n\nIf an existing patient signed up under our previous prices at a higher rate and is requesting to be switched to our current lower rate we can honor this request.\n\nThese matters can be sent to SS to review/address.\n\nWe just do not want to offer this to the patient; it is only if they request it specifically.\n\n-Failed Payments caught up\n\nIf we see a case where a payment fails for one month and the patient makes a payment to their next subscription charge date when it arrives, they still end up with a failed payment tied to the new charge.\n\nTypically the system does not prompt any services while their subscription is inactive from failed payments. Due to this, the new charge should be voided or the charge date should be delayed.\n\nPlease send these cases to the SS for review/action to void payment or delay the charge date.\n\nRemember to also create the refills and clarifications ticket for the pharmacy team to monitor any refills that may have been missed due to nonpayment",
       "sourceExcerpt": "CS does not need to process cancellation in stripe. Once reason for cancellation request has been provided by the patient, send the matter to Shift Supervisor team. They will proceed with cancellation if appropriate.\n\n*** Remember if a patient states they would like a refund, please specify that a r...",
