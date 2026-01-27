@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Update } from "../types";
+import { extractSummary } from "../utils/summary";
 import "./UpdateCard.css";
 
 interface UpdateCardProps {
@@ -8,6 +9,8 @@ interface UpdateCardProps {
 
 export default function UpdateCard({ update }: UpdateCardProps) {
   const isSuperseded = update.status === "superseded";
+  const summary = extractSummary(update.body);
+  const isTruncated = update.body.length > summary.length;
 
   return (
     <div className={`update-card ${isSuperseded ? "superseded" : ""}`}>
@@ -40,8 +43,8 @@ export default function UpdateCard({ update }: UpdateCardProps) {
       </div>
 
       <p className="update-card-summary">
-        {update.body.substring(0, 150)}
-        {update.body.length > 150 ? "..." : ""}
+        {summary}
+        {isTruncated && <span className="summary-ellipsis">…</span>}
       </p>
 
       {isSuperseded && update.supersededById && (

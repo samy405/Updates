@@ -115,6 +115,13 @@
   margin: 1.25rem 0 1.5rem 0;
   font-size: 0.9375rem;
   opacity: 0.85;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.summary-ellipsis {
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .superseded-notice {
