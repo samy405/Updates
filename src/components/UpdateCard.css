@@ -1,0 +1,133 @@
+.update-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: white;
+  transition: box-shadow 0.2s ease;
+}
+
+.update-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.update-card.superseded {
+  opacity: 0.6;
+  background: #fafafa;
+}
+
+.update-card-header {
+  margin-bottom: 1rem;
+}
+
+.update-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.update-card-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.needs-answer-badge {
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.superseded-badge {
+  background: #e5e5e5;
+  color: #666;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.update-card-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.update-author {
+  font-weight: 500;
+}
+
+.update-category {
+  color: #999;
+}
+
+.update-card-summary {
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+}
+
+.superseded-link {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.superseded-link a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.superseded-link a:hover {
+  text-decoration: underline;
+}
+
+.replaces-info {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  color: #666;
+  font-style: italic;
+}
+
+.update-card-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #1a1a1a;
+}
+
+.btn-primary:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.btn-secondary {
+  background: white;
+  color: #1a1a1a;
+  border: 1px solid #d0d0d0;
+}
+
+.btn-secondary:hover {
+  border-color: #999;
+  background: #fafafa;
+}

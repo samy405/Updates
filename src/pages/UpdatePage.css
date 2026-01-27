@@ -1,0 +1,178 @@
+.update-page {
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.update-page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #1a1a1a;
+}
+
+.update-content {
+  background: white;
+  border-radius: 8px;
+  padding: 3rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.update-header {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.update-header-top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.update-header h1 {
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0;
+  color: #1a1a1a;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.update-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.update-meta-item strong {
+  color: #333;
+  margin-right: 0.25rem;
+}
+
+.superseded-notice,
+.replaces-notice {
+  background: #f8f9fa;
+  border-left: 3px solid #999;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 4px;
+}
+
+.superseded-notice p,
+.replaces-notice p {
+  margin: 0 0 0.5rem 0;
+  color: #555;
+}
+
+.replaces-notice ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+.replaces-notice li {
+  margin-bottom: 0.25rem;
+}
+
+.replaces-notice a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.replaces-notice a:hover {
+  text-decoration: underline;
+}
+
+.update-body {
+  margin-bottom: 2rem;
+}
+
+.update-body h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 1rem 0;
+  color: #1a1a1a;
+}
+
+.update-body-content {
+  line-height: 1.8;
+  color: #555;
+}
+
+.update-body-content p {
+  margin: 0 0 1rem 0;
+}
+
+.update-source {
+  margin-bottom: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.update-source h2 {
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0 0 1rem 0;
+  color: #666;
+}
+
+.update-source blockquote {
+  margin: 0;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-left: 3px solid #d0d0d0;
+  border-radius: 4px;
+  color: #666;
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.update-discussion {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.update-discussion h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 1.5rem 0;
+  color: #1a1a1a;
+}
+
+#giscus-container {
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .update-page-container {
+    padding: 1rem;
+  }
+
+  .update-content {
+    padding: 1.5rem;
+  }
+
+  .update-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .update-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
