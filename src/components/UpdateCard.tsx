@@ -14,16 +14,28 @@ export default function UpdateCard({ update }: UpdateCardProps) {
       <div className="update-card-header">
         <div className="update-card-title-row">
           <h3 className="update-card-title">{update.title}</h3>
-          {update.needsAnswer && !isSuperseded && (
-            <span className="needs-answer-badge">Needs answer</span>
-          )}
-          {isSuperseded && (
-            <span className="superseded-badge">Superseded</span>
-          )}
+          <div className="update-badges">
+            {update.needsAnswer && !isSuperseded && (
+              <span className="needs-answer-badge">Needs answer</span>
+            )}
+            {isSuperseded && (
+              <span className="superseded-badge">Superseded</span>
+            )}
+          </div>
         </div>
         <div className="update-card-meta">
-          <span className="update-author">{update.author}</span>
-          <span className="update-category">{update.category}</span>
+          <span className="update-meta-item">
+            <span className="update-meta-label">Author:</span>
+            <span className="update-author">{update.author}</span>
+          </span>
+          <span className="update-meta-item">
+            <span className="update-meta-label">Category:</span>
+            <span className="update-category">{update.category}</span>
+          </span>
+          <span className="update-meta-item">
+            <span className="update-meta-label">Date:</span>
+            <span className="update-date">{new Date(update.datePosted).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+          </span>
         </div>
       </div>
 
@@ -33,16 +45,21 @@ export default function UpdateCard({ update }: UpdateCardProps) {
       </p>
 
       {isSuperseded && update.supersededById && (
-        <div className="superseded-link">
-          <Link to={`/update/${update.supersededById}`}>
-            → Replaced by update from {new Date(update.datePosted).toLocaleDateString()}
-          </Link>
+        <div className="superseded-notice">
+          <p>
+            <strong>Note:</strong> This update has been superseded.{" "}
+            <Link to={`/update/${update.supersededById}`}>
+              View replacement update →
+            </Link>
+          </p>
         </div>
       )}
 
       {update.supersedesIds.length > 0 && (
         <div className="replaces-info">
-          Replaces {update.supersedesIds.length} previous update{update.supersedesIds.length !== 1 ? "s" : ""}
+          <p>
+            <strong>Replaces:</strong> This update supersedes {update.supersedesIds.length} previous update{update.supersedesIds.length !== 1 ? "s" : ""}.
+          </p>
         </div>
       )}
 

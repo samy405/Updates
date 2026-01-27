@@ -107,18 +107,30 @@ export default function Home() {
           </div>
         ) : updatesByDate.length === 0 ? (
           <div className="empty-state">
-            <p>No updates found in this category.</p>
+            <p>No updates found{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}.</p>
           </div>
         ) : (
-          updatesByDate.map(([date, dateUpdates]) => (
+          <>
+            <div className="updates-header">
+              <p className="updates-count">
+                {filteredUpdates.length} {filteredUpdates.length === 1 ? "update" : "updates"}
+                {selectedCategory !== "All" && ` in ${selectedCategory}`}
+              </p>
+            </div>
+            {updatesByDate.map(([date, dateUpdates]) => (
             <div key={date} className="date-group">
               <button
                 className="date-header"
                 onClick={() => toggleDate(date)}
+                aria-expanded={expandedDates.has(date)}
               >
                 <span className="date-title">{formatDate(date)}</span>
-                <span className="date-count">{dateUpdates.length} update{dateUpdates.length !== 1 ? "s" : ""}</span>
-                <span className="date-toggle">{expandedDates.has(date) ? "−" : "+"}</span>
+                <span className="date-count">
+                  {dateUpdates.length} {dateUpdates.length === 1 ? "update" : "updates"}
+                </span>
+                <span className="date-toggle" aria-hidden="true">
+                  {expandedDates.has(date) ? "−" : "+"}
+                </span>
               </button>
               {expandedDates.has(date) && (
                 <div className="date-updates">
@@ -136,7 +148,8 @@ export default function Home() {
                 </div>
               )}
             </div>
-          ))
+            ))}
+          </>
         )}
       </div>
     </div>

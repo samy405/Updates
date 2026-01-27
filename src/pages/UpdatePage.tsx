@@ -72,7 +72,7 @@ export default function UpdatePage() {
         <div className="update-page-container">
           <h1>Update not found</h1>
           <Link to="/" className="btn btn-primary">
-            ← Back to Updates
+            ← Back to all updates
           </Link>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function UpdatePage() {
     <div className="update-page">
       <div className="update-page-container">
         <Link to="/" className="back-link">
-          ← Back to Updates
+          ← Back to all updates
         </Link>
 
         <article className="update-content">
@@ -112,13 +112,16 @@ export default function UpdatePage() {
             </div>
             <div className="update-meta">
               <span className="update-meta-item">
-                <strong>Date:</strong> {formatDate(update.datePosted)}
+                <span className="update-meta-label">Date:</span>
+                <span className="update-meta-value">{formatDate(update.datePosted)}</span>
               </span>
               <span className="update-meta-item">
-                <strong>Author:</strong> {update.author}
+                <span className="update-meta-label">Author:</span>
+                <span className="update-meta-value">{update.author}</span>
               </span>
               <span className="update-meta-item">
-                <strong>Category:</strong> {update.category}
+                <span className="update-meta-label">Category:</span>
+                <span className="update-meta-value">{update.category}</span>
               </span>
             </div>
           </header>
@@ -126,9 +129,9 @@ export default function UpdatePage() {
           {supersededUpdate && (
             <div className="superseded-notice">
               <p>
-                <strong>Note:</strong> This update has been superseded by{" "}
+                <strong>Note:</strong> This update has been superseded.{" "}
                 <Link to={`/update/${update.supersededById}`}>
-                  an update from {formatDate(supersededUpdate.datePosted)}
+                  View replacement update from {formatDate(supersededUpdate.datePosted)} →
                 </Link>
               </p>
             </div>
@@ -137,7 +140,7 @@ export default function UpdatePage() {
           {update.supersedesIds.length > 0 && (
             <div className="replaces-notice">
               <p>
-                <strong>Replaces:</strong> This update replaces{" "}
+                <strong>Replaces:</strong> This update supersedes{" "}
                 {update.supersedesIds.length} previous update
                 {update.supersedesIds.length !== 1 ? "s" : ""}:
               </p>
@@ -159,19 +162,22 @@ export default function UpdatePage() {
           <div className="update-body">
             <h2>Details</h2>
             <div className="update-body-content">
-              {update.body.split("\n").map((paragraph, idx) => (
-                <p key={idx}>{paragraph}</p>
+              {update.body.split("\n").filter(p => p.trim()).map((paragraph, idx) => (
+                <p key={idx}>{paragraph.trim()}</p>
               ))}
             </div>
           </div>
 
           <div className="update-source">
-            <h2>Source Excerpt</h2>
+            <h2>Source</h2>
             <blockquote>{update.sourceExcerpt}</blockquote>
           </div>
 
           <div className="update-discussion">
             <h2>Discussion</h2>
+            <p className="discussion-note">
+              Questions or comments about this update? Use the discussion thread below.
+            </p>
             <div id="giscus-container"></div>
           </div>
         </article>

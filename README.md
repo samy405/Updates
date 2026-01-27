@@ -167,6 +167,17 @@ Ensure `data/updates.json` is included in your build (it should be by default).
 - The `needsAnswer` flag must be manually toggled in `data/updates.json`
 - Giscus requires GitHub Discussions to be enabled in your repository
 
+## Recent UI/UX Improvements
+
+The following polish improvements were implemented to enhance clarity, trustworthiness, and daily usability:
+
+- **Visual Hierarchy**: Improved spacing and structure in update cards with clearer separation between title, metadata, and content
+- **Metadata Display**: Added structured labels (Author, Category, Date) with consistent formatting for better scanability
+- **Date Grouping**: Enhanced date headers with clearer count indicators and improved accessibility
+- **Superseded Updates**: Improved visual presentation with better contrast and clearer messaging
+- **Professional Language**: Standardized terminology and micro-copy throughout for internal tool appropriateness
+- **Code Quality**: Added accessibility attributes and improved code organization
+
 ## License
 
 Internal project - all rights reserved.

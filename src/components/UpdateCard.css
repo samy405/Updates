@@ -14,13 +14,15 @@
 }
 
 .update-card.superseded {
-  opacity: 0.6;
+  opacity: 0.65;
   background: var(--bg);
+  border-color: var(--border);
 }
 
 .update-card.superseded:hover {
-  opacity: 0.75;
+  opacity: 0.8;
   transform: translateY(-1px);
+  border-color: var(--muted);
 }
 
 .update-card-header {
@@ -30,9 +32,17 @@
 .update-card-title-row {
   display: flex;
   align-items: flex-start;
-  gap: 0.875rem;
-  margin-bottom: 0.875rem;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
+}
+
+.update-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .update-card-title {
@@ -73,45 +83,63 @@
 
 .update-card-meta {
   display: flex;
-  gap: 1.5rem;
-  font-size: 0.875rem;
+  gap: 1.25rem;
+  font-size: 0.8125rem;
   color: var(--muted);
   flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
 }
 
-.update-author {
-  font-weight: 600;
-  color: var(--text);
+.update-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
 }
 
-.update-category {
+.update-meta-label {
   color: var(--muted);
+  font-weight: 500;
+}
+
+.update-author,
+.update-category,
+.update-date {
+  color: var(--text);
+  font-weight: 500;
 }
 
 .update-card-summary {
   color: var(--text);
-  line-height: 1.75;
-  margin: 0 0 1.5rem 0;
-  opacity: 0.8;
+  line-height: 1.7;
+  margin: 1.25rem 0 1.5rem 0;
   font-size: 0.9375rem;
+  opacity: 0.85;
 }
 
-.superseded-link {
-  margin-bottom: 1rem;
+.superseded-notice {
+  background: var(--bg);
+  border-left: 3px solid var(--muted);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 6px;
   font-size: 0.875rem;
 }
 
-.superseded-link a {
+.superseded-notice p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.superseded-notice a {
   color: var(--accent);
   text-decoration: none;
   font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
   transition: color 0.2s ease;
 }
 
-.superseded-link a:hover {
+.superseded-notice a:hover {
   color: var(--accent-dark);
   text-decoration: underline;
 }
@@ -119,12 +147,16 @@
 .replaces-info {
   margin-bottom: 1.25rem;
   font-size: 0.875rem;
-  color: var(--muted);
-  font-style: italic;
   padding: 0.875rem 1rem;
   background: var(--accent-light);
-  border-radius: 8px;
+  border-radius: 6px;
   border-left: 3px solid var(--accent);
+}
+
+.replaces-info p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.5;
 }
 
 .update-card-actions {

@@ -73,9 +73,15 @@
   gap: 0.5rem;
 }
 
-.update-meta-item strong {
+.update-meta-label {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.update-meta-value {
   color: var(--text);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .superseded-notice,
@@ -152,25 +158,24 @@
 }
 
 .update-source h2 {
-  font-size: 1.25rem;
+  font-size: 0.875rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
   color: var(--muted);
   text-transform: uppercase;
-  font-size: 0.75rem;
   letter-spacing: 0.05em;
 }
 
 .update-source blockquote {
   margin: 0;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   background: var(--bg);
-  border-left: 4px solid var(--accent);
-  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
   color: var(--muted);
-  font-style: italic;
   font-size: 0.875rem;
   line-height: 1.6;
+  font-family: inherit;
 }
 
 .update-discussion {
@@ -182,8 +187,15 @@
 .update-discussion h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 0.75rem 0;
   color: var(--text);
+}
+
+.discussion-note {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
 }
 
 #giscus-container {
