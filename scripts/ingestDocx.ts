@@ -827,13 +827,20 @@ function removeChatter(text: string): string {
 }
 
 async function ingestDocx(): Promise<void> {
-  console.log("Reading DOCX file...");
+  console.log("=== CS Updates Ingestion ===");
+  console.log(`Looking for DOCX file at: ${DOCX_FILE}`);
+  
   if (!fs.existsSync(DOCX_FILE)) {
-    console.error(`DOCX file not found at: ${DOCX_FILE}`);
+    console.error(`ERROR: DOCX file not found at: ${DOCX_FILE}`);
+    console.error("Please ensure 'CSupdates feeder.docx' exists in the project root.");
     process.exit(1);
   }
+  
+  console.log(`✓ File found: ${DOCX_FILE}`);
+  console.log("Reading DOCX file...");
   const result = await mammoth.extractRawText({ path: DOCX_FILE });
   const rawText = result.value;
+  console.log(`✓ Extracted ${rawText.length} characters from document`);
 
   console.log("Loading existing updates...");
   let existingData: UpdatesData;
@@ -1098,11 +1105,25 @@ async function ingestDocx(): Promise<void> {
     fs.mkdirSync(publicDataDir, { recursive: true });
   }
 
-  console.log(`Writing ${allUpdates.length} total updates...`);
+  console.log(`\n=== Ingestion Summary ===`);
+  console.log(`Total updates in database: ${allUpdates.length}`);
+  console.log(`New updates added: ${newUpdates.length}`);
+  console.log(`Updates written to: ${DATA_FILE}`);
+  console.log(`Updates written to: ${DATA_FILE_SOURCE}`);
+  
   // Write to both locations
   fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2), "utf-8");
   fs.writeFileSync(DATA_FILE_SOURCE, JSON.stringify(updatedData, null, 2), "utf-8");
-  console.log(`Ingestion complete! Added ${newUpdates.length} new updates.`);
+  
+  console.log(`✓ Files written successfully`);
+  console.log(`\nIngestion complete!`);
+  
+  if (allUpdates.length === 0) {
+    console.warn("\n⚠️  WARNING: No updates were extracted. Check:");
+    console.warn("  1. Document contains 'end of update' delimiters");
+    console.warn("  2. Updates meet the strict definition criteria");
+    console.warn("  3. Date headings are properly formatted");
+  }
 }
 
 ingestDocx().catch((error) => {

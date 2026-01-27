@@ -1,4 +1,134 @@
 {
-  "updates": [],
-  "lastIngestedDate": null
+  "updates": [
+    {
+      "id": "20260128-lab-scheduling-link-issue",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Labs",
+      "title": "Lab scheduling link issue",
+      "body": "-Lab scheduling link issues\n\nWhen issues occur for lab scheduling please do the following:\n\nVerify lab scheduling is not working on our end and not just the patients\n\nIf it is not working, then this indicates the issue is not specific to the patient, and tech should be notified.\n\nPlease send message to Tech_CS channel.\n\nSend message to the patient letting them know our tech has been notified.\n\nSnooze ticket to follow up on the matter next day.\n\nIf Tech has not provided any updates attempt to utilize the link.\n\nIf it works please notify the patient to proceed.\n\nIf it does not work continue to snooze until tech provides an update or we see resolution on our end.\n\n-Patient states they did not agree to auto renewing subscription\n\nThe following macros have been updated for if a patient messages in stating they did not agree to an auto renewing subscription. These include an image of the terms each patient agrees to when they sign up for the associated HRT/TRT subscription. Here are the macro titles:\n\nPatient states they did not sign up for auto renewing subscription at a rate of $199 every 4 weeks\n\nPatient states they did not sign up for auto renewing subscription at a rate of $499 every 12 weeks\n\nPatient states they did not sign up for auto renewing subscription at a rate of $1799 every 48 weeks\n\nPlease let me know if you have any questions!",
+      "sourceExcerpt": "-Lab scheduling link issues\n\nWhen issues occur for lab scheduling please do the following:\n\nVerify lab scheduling is not working on our end and not just the patients\n\nIf it is not working, then this indicates the issue is not specific to the patient, and tech should be notified.\n\nPlease send message...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-a-routing-error",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Billing",
+      "title": "A routing error",
+      "body": "@channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of the issue. Thank you!\n\n-\n\n@channel Important reminders and updates. Please give a thumbs up when you have reviewed the following:\n\n-Employment Verification\n\nIf we receive a call from someone wanting employment verification with the company, please give them Lindsay’s email: lindsay@fountain.net\n\n*** We do not provide employment verifications over the phone. ***",
+      "sourceExcerpt": "@channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of the issue. Thank you!\n\n-\n\n@channel Important reminders and updates...",
+      "supersedesIds": [
+        "20260128-lab-scheduling-link-issue",
+        "20260128-a-routing-error",
+        "20260128-progesterone-sublingual-300-mg-no-longer-offered",
+        "20260128-requests-routed-to-shift-supervisor",
+        "20260128-billing-process-update",
+        "20260128-lab-process-update",
+        "20260128-pharmacy-process-update",
+        "20260128-pharmacy-process-update"
+      ],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-progesterone-sublingual-300-mg-no-longer-offered",
+      "datePosted": "2026-01-28",
+      "author": "Good morning",
+      "category": "Labs",
+      "title": "Progesterone sublingual 300 mg no longer offered",
+      "body": "Good morning @channel. We have some Updates and Reminders for the day. Please review.\n\nUPDATES\n\n-Sublingual Progesterone 300mg\n\nWe will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients will be receiving a blast message letting them know about the change.\n\nIf a patient has any additional questions from the message they receive, please defer to the SS team\n\n-HRT Labs not required for specific patients\n\nWe have successfully been seeing New York HRT patients with no labs for several weeks now. We are going to broaden the pilot program to several other patients in different states.\n\nPlease ALWAYS first check to see if a lab order was generated.\n\nIf no lab order was generated, that means they are part of our no labs pilot program. Please do not offer labs to these patients.",
+      "sourceExcerpt": "Good morning @channel. We have some Updates and Reminders for the day. Please review.\n\nUPDATES\n\n-Sublingual Progesterone 300mg\n\nWe will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients will be receiving a blast message letting them know about t...",
+      "supersedesIds": [
+        "20260128-existing-patient-price-change-process",
+        "20260128-pharmacy-process-update"
+      ],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-requests-routed-to-shift-supervisor",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Billing",
+      "title": "Requests routed to shift supervisor",
+      "body": "-Charge cost of labs if outside of a subscription\n\nIn the following two scenarios we will manually charge the patient a $35 fee for lab work. (Additional charges would apply if the patient chose to schedule at LabCorp or have any expanded panels tested.)\n\nIf a patient meets with a provider and it is determined that they need to have labs redone to reevaluate if they are a candidate for HRT/TRT (prior to them setting up a subscription), we will need to charge the $35 fee for the additional lab draw prior to scheduling.\n\nWhen a patient cancels their subscription and wants to complete a follow up visit with the provider to determine if they want to continue treatment. If the provider then recommends labs before the patient decides they'd like to continue with a subscription, they will need to be charged the $35 lab fee prior to scheduling.\n\nCS will send these scenarios to the Shift Supervisor team for review/approval.\n\nOnce confirmed that the patient qualifies for the lab work outside of a subscription, it will be sent back to CS to process charge and provide the scheduling link to the patient.\n\nREMINDERS\n\n-Relay Macro/Rerouting questions and concerns\n\nWhen a patient messages in and their request/question needs to be routed to a different department we want to make sure we acknowledge the patient and let them know that we’ve received their message, and are seeking assistance from another department.\n\nCS please take the following steps:\n\nNotify the patient that you are relaying their concern over to the correct department\n\nPlease utilize the macros listed under General CS: Relay for these situations\n\nThen reroute the conversation or create a ticket for the correct department.",
+      "sourceExcerpt": "-Charge cost of labs if outside of a subscription\n\nIn the following two scenarios we will manually charge the patient a $35 fee for lab work. (Additional charges would apply if the patient chose to schedule at LabCorp or have any expanded panels tested.)\n\nIf a patient meets with a provider and it is...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-billing-process-update",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Billing",
+      "title": "Billing process update",
+      "body": "-Updating Billing Information\n\nWe cannot update a patient’s card or billing information manually. The patient will need to utilize their billing link to update any information themselves. Please direct them to their personal billing link.",
+      "sourceExcerpt": "-Updating Billing Information\n\nWe cannot update a patient’s card or billing information manually. The patient will need to utilize their billing link to update any information themselves. Please direct them to their personal billing link.",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-lab-process-update",
+      "datePosted": "2026-01-28",
+      "author": "Hey",
+      "category": "Labs",
+      "title": "Lab process update",
+      "body": "Hey @channel. Sorry it has taken me half the day to get these updates to you. I got a new work computer this week and its completely out of my realm (its a Mac:grimacing:) so its taking me a minute to adjust to everything. :rolling_on_the_floor_laughing: As always, I appreciate you all and your amazing work! Please leave me a reaction on this post once you review.\n\nREMINDER\n\n-Email Lab order requests\n\nWhen a patient requests to have a lab order emailed to them, please create a ticket for the SS. This will allow for the ticket to stay in the SS inbox if the patient continues to reply in the conversation.\n\nUPDATES",
+      "sourceExcerpt": "Hey @channel. Sorry it has taken me half the day to get these updates to you. I got a new work computer this week and its completely out of my realm (its a Mac:grimacing:) so its taking me a minute to adjust to everything. :rolling_on_the_floor_laughing: As always, I appreciate you all and your amaz...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-existing-patient-price-change-process",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Miscellaneous",
+      "title": "Existing patient price change process",
+      "body": "-Existing Patients Requesting new prices\n\nIf an existing patient signed up under our previous prices at a higher rate and is requesting to be switched to our current lower rate we can honor this request.\n\nThese matters can be sent to SS to review/address.\n\nWe just do not want to offer this to the patient; it is only if they request it specifically.",
+      "sourceExcerpt": "-Existing Patients Requesting new prices\n\nIf an existing patient signed up under our previous prices at a higher rate and is requesting to be switched to our current lower rate we can honor this request.\n\nThese matters can be sent to SS to review/address.\n\nWe just do not want to offer this to the pa...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-pharmacy-process-update",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Pharmacy",
+      "title": "Pharmacy process update",
+      "body": "-Failed Payments caught up\n\nIf we see a case where a payment fails for one month and the patient makes a payment to their next subscription charge date when it arrives, they still end up with a failed payment tied to the new charge.\n\nTypically the system does not prompt any services while their subscription is inactive from failed payments. Due to this, the new charge should be voided or the charge date should be delayed.\n\nPlease send these cases to the SS for review/action to void payment or delay the charge date.\n\nRemember to also create the refills and clarifications ticket for the pharmacy team to monitor any refills that may have been missed due to nonpayment",
+      "sourceExcerpt": "-Failed Payments caught up\n\nIf we see a case where a payment fails for one month and the patient makes a payment to their next subscription charge date when it arrives, they still end up with a failed payment tied to the new charge.\n\nTypically the system does not prompt any services while their subs...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260128-pharmacy-process-update",
+      "datePosted": "2026-01-28",
+      "author": "Unknown",
+      "category": "Pharmacy",
+      "title": "Pharmacy process update",
+      "body": "-Curexa Delays when asking for overnight shipping\n\nIf a patient requests expedited shipping for a medication that is filled through Curexa specifically (Tcream, Tadalafil, Anastrozole doses over 2.5mg) it is not necessarily beneficial since we have to cancel the order and request the change in shipping which can cause more of a delay.\n\nPlease send the patient the following macro: General CS: Curexa Overnight Shipping Request\n\nPlease let me know if you have any questions!",
+      "sourceExcerpt": "-Curexa Delays when asking for overnight shipping\n\nIf a patient requests expedited shipping for a medication that is filled through Curexa specifically (Tcream, Tadalafil, Anastrozole doses over 2.5mg) it is not necessarily beneficial since we have to cancel the order and request the change in shipp...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    }
+  ],
+  "lastIngestedDate": "2026-01-28"
 }

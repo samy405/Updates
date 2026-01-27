@@ -23,8 +23,14 @@ export default function Home() {
   useEffect(() => {
     // Load updates data
     fetch("/data/updates.json")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch updates: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data: UpdatesData) => {
+        console.log(`Loaded ${data.updates.length} updates from /data/updates.json`);
         setUpdates(data.updates);
         setLoading(false);
       })
@@ -104,6 +110,13 @@ export default function Home() {
         {loading ? (
           <div className="empty-state">
             <p>Loading updates...</p>
+          </div>
+        ) : updates.length === 0 ? (
+          <div className="empty-state">
+            <p>No updates found. Please run <code>npm run ingest</code> to populate updates.</p>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.5rem" }}>
+              Check the browser console for loading errors.
+            </p>
           </div>
         ) : updatesByDate.length === 0 ? (
           <div className="empty-state">
