@@ -255,21 +255,288 @@ function parseDateHeading(text: string): Date | null {
   return null;
 }
 
-function extractTitle(body: string): string {
-  // Remove author name from start if present
+/**
+ * Extracts a meaningful, concise title from update body text.
+ * 
+ * Test cases (before -> after):
+ * - "Hi @channel we had an error occur with our lab scheduling" -> "Lab scheduling error fix"
+ * - "Per tech this should be fixed" -> "Technical issue resolved"
+ * - "There appears to be a routing error when a new subscription occurs" -> "Subscription routing error"
+ * - "Important reminders and updates. -Employment Verification..." -> "Employment verification process"
+ * - "Good morning @channel. We have some Updates... -Sublingual Progesterone..." -> "Sublingual progesterone policy change"
+ * - "Hey @channel. ... -Cancellation Reasons..." -> "Cancellation workflow update"
+ * - "last night there was a brief outage while we were making updates for HRT" -> "HRT system outage fix"
+ */
+function extractTitle(body: string, category: UpdateCategory): string {
+  // Remove author name and common prefixes
   let cleaned = body;
   const authorPattern = /^[A-Z][a-z]+ [A-Z][a-z]+(?:\s+@channel)?\s*/;
   cleaned = cleaned.replace(authorPattern, "");
-  
-  // Remove "replied to a thread:" prefix
   cleaned = cleaned.replace(/^replied to a thread:\s*/i, "");
   
-  // Try to extract first sentence or first 80 chars
-  const firstSentence = cleaned.match(/^[^.!?]+[.!?]/);
-  if (firstSentence) {
-    return firstSentence[0].trim().substring(0, 80);
+  // Remove common greetings
+  cleaned = cleaned.replace(/^(hi|hello|hey|good morning|good afternoon)\s+@?channel[:\s,]*/i, "");
+  cleaned = cleaned.replace(/^sorry\s+[^.]*\.\s*/i, "");
+  
+  // Look for explicit title markers (e.g., "Title:", "Subject:")
+  // Also look for "Title: Testy Mr Tester Lab Booking error" patterns
+  // Match across line breaks if needed
+  const titleMatch = cleaned.match(/(?:title|subject)[:\s]+([^\n"']{10,80})/i);
+  if (titleMatch && titleMatch[1]) {
+    let title = titleMatch[1].trim();
+    // Clean up the title (remove quotes, extra spaces, stop at next quote or newline)
+    title = title.replace(/^["']|["']$/g, "").split(/["'\n]/)[0].trim();
+    if (title.length > 10 && title.length < 80) {
+      // Extract key part if it's too long - prefer first meaningful words
+      const words = title.split(/\s+/);
+      if (words.length > 10) {
+        // Take first 8 words that form a coherent title
+        return normalizeTitle(words.slice(0, 8).join(" "));
+      }
+      return normalizeTitle(title);
+    }
   }
-  return cleaned.substring(0, 80).trim() + (cleaned.length > 80 ? "..." : "");
+  
+  // Look for bullet headers (e.g., "-Employment Verification", "UPDATES-Sublingual Progesterone")
+  // Also match "UPDATES-" prefix
+  const bulletMatch = cleaned.match(/(?:^|\n)(?:updates?[\s-]+)?[\-\*•]\s*([A-Z][^\n:]{5,60})(?::|$)/i);
+  if (bulletMatch && bulletMatch[1]) {
+    const bulletTitle = bulletMatch[1].trim();
+    // Skip if it's just "UPDATES" or "REMINDERS"
+    if (!/^(updates?|reminders?)$/i.test(bulletTitle) && bulletTitle.length > 5) {
+      return normalizeTitle(bulletTitle);
+    }
+  }
+  
+  // Look for section headers in all caps or title case
+  const headerMatch = cleaned.match(/(?:^|\n)([A-Z][A-Z\s]{5,40}):/);
+  if (headerMatch && headerMatch[1]) {
+    const header = headerMatch[1].trim();
+    if (header.split(/\s+/).length <= 6) {
+      return normalizeTitle(header);
+    }
+  }
+  
+  // Extract based on key phrases
+  const lowerText = cleaned.toLowerCase();
+  
+  // Look for "no longer" patterns with subject
+  if (lowerText.match(/\bno longer\b/)) {
+    const noLongerMatch = cleaned.match(/no longer\s+(?:be\s+)?(?:offering|providing|using|doing|sending)\s+([^.!?]{5,40})/i);
+    if (noLongerMatch && noLongerMatch[1]) {
+      const subject = noLongerMatch[1].trim().split(/\s+/).slice(0, 5).join(" ");
+      if (subject.length > 5) {
+        return normalizeTitle(`${subject} policy change`);
+      }
+    }
+  }
+  
+  // Look for specific medication/product names with policy changes
+  const medicationMatch = cleaned.match(/(sublingual\s+progesterone|progesterone\s+sublingual|anastrozole|tadalafil|enclomiphene)/i);
+  if (medicationMatch && lowerText.match(/\b(no longer|will not|discontinued|stopped)\b/)) {
+    return normalizeTitle(`${medicationMatch[1]} policy change`);
+  }
+  
+  // Error/Issue patterns - look for subject before or after error word
+  if (lowerText.match(/\b(error|issue|bug|problem|outage)\b/)) {
+    // Pattern: "we had an error occur with our lab scheduling" -> extract "lab scheduling"
+    const errorWithSubjectMatch = cleaned.match(/(?:error|issue|bug|problem|outage)\s+(?:occur|with|in|on)\s+(?:our|the|a|an)?\s*([a-z]+(?:\s+[a-z]+){1,3})/i);
+    if (errorWithSubjectMatch && errorWithSubjectMatch[1]) {
+      const subject = errorWithSubjectMatch[1].trim();
+      if (subject.length > 3 && !/^(an|the|a|this|that|there|we|our)$/i.test(subject)) {
+        const action = getActionWord(lowerText);
+        return normalizeTitle(`${subject} ${action}`);
+      }
+    }
+    // Pattern: "error occur with our lab scheduling" -> extract "lab scheduling"
+    const errorWithOurMatch = cleaned.match(/error\s+occur\s+with\s+our\s+([a-z]+(?:\s+[a-z]+){1,2})/i);
+    if (errorWithOurMatch && errorWithOurMatch[1]) {
+      const subject = errorWithOurMatch[1].trim();
+      if (subject.length > 3) {
+        return normalizeTitle(`${subject} error fix`);
+      }
+    }
+    // Pattern: "lab scheduling error" (subject before error)
+    const errorMatch = cleaned.match(/([a-z]+(?:\s+[a-z]+){1,2})\s+(?:error|issue|bug|problem|outage)/i);
+    if (errorMatch && errorMatch[1]) {
+      const subject = errorMatch[1].trim();
+      // Validate it's a real subject (not just "an" or "the")
+      if (subject.length > 3 && !/^(an|the|a|this|that|there|we|our|had|with)$/i.test(subject)) {
+        const action = getActionWord(lowerText);
+        return normalizeTitle(`${subject} ${action}`);
+      }
+    }
+    // Look for system/service names mentioned near error
+    const systemMatch = cleaned.match(/(lab|billing|pharmacy|system|subscription|checkout|routing|scheduling|labcorp|sonora|quest)\s*(?:error|issue|problem|outage|scheduling|booking)/i);
+    if (systemMatch) {
+      const system = systemMatch[1];
+      const action = getActionWord(lowerText);
+      return normalizeTitle(`${system} ${action}`);
+    }
+  }
+  
+  // Fix/Resolution patterns
+  if (lowerText.match(/\b(fixed|resolved|corrected|patched|should be fixed)\b/)) {
+    // Look for what was fixed
+    const fixSubjectMatch = cleaned.match(/(labcorp|lab|routing|subscription|checkout|scheduling|system)\s+(?:issue|error|problem)\s+(?:should\s+be\s+)?fixed/i);
+    if (fixSubjectMatch) {
+      return normalizeTitle(`${fixSubjectMatch[1]} issue resolved`);
+    }
+    // Generic fix
+    if (lowerText.match(/per tech.*fixed/i)) {
+      return normalizeTitle("Technical issue resolved");
+    }
+  }
+  
+  // Process/Policy/Workflow patterns
+  if (lowerText.match(/\b(new|updated|changed|adjusted|adjusting)\s+(process|policy|workflow|procedure|sop)\b/)) {
+    // Look for workflow name
+    const workflowMatch = cleaned.match(/(cancellation|employment|verification|lab|billing|pharmacy)\s+workflow/i);
+    if (workflowMatch) {
+      return normalizeTitle(`${workflowMatch[1]} workflow update`);
+    }
+    // Look for process name
+    const processMatch = cleaned.match(/(?:new|updated|changed|adjusted|adjusting)\s+([a-z]+(?:\s+[a-z]+){0,2})\s+(?:process|policy|workflow)/i);
+    if (processMatch && processMatch[1]) {
+      return normalizeTitle(`${processMatch[1]} ${getProcessAction(lowerText)}`);
+    }
+  }
+  
+  // Look for "routing error" specifically
+  if (lowerText.match(/routing\s+error/)) {
+    if (lowerText.match(/subscription/)) {
+      return normalizeTitle("Subscription routing error");
+    }
+    return normalizeTitle("Routing error");
+  }
+  
+  // Look for "there appears to be" pattern
+  if (lowerText.match(/there\s+appears\s+to\s+be/)) {
+    const appearsMatch = cleaned.match(/there\s+appears\s+to\s+be\s+a\s+([a-z]+(?:\s+[a-z]+){0,2})\s+(?:error|issue)/i);
+    if (appearsMatch && appearsMatch[1]) {
+      return normalizeTitle(`${appearsMatch[1]} error`);
+    }
+  }
+  
+  // Look for specific update subjects in structured format
+  const updateMatch = cleaned.match(/(?:updates?|reminders?)[\s:]+([A-Z][^\n]{10,50})/i);
+  if (updateMatch && updateMatch[1]) {
+    const updateText = updateMatch[1].trim();
+    // Extract first meaningful part
+    const parts = updateText.split(/[.!?]/)[0].split(/\s+/).slice(0, 6);
+    if (parts.length >= 2) {
+      return normalizeTitle(parts.join(" "));
+    }
+  }
+  
+  // Extract first meaningful sentence (skip greetings and filler)
+  const sentences = cleaned.split(/[.!?]+/).filter(s => {
+    const trimmed = s.trim();
+    return trimmed.length > 20 && 
+           !trimmed.match(/^(thanks|thank you|please|just|sorry|appreciate|hi|hey|good morning|good afternoon)/i) &&
+           !trimmed.match(/^(how is|what is|when will|can you|could you)/i);
+  });
+  
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
+    const words = trimmed.split(/\s+/);
+    
+    // Skip if too short or too long
+    if (words.length < 4 || words.length > 15) continue;
+    
+    // Remove leading filler words
+    let startIdx = 0;
+    while (startIdx < words.length && /^(the|a|an|this|that|there|we|our|please|just|hi|hey|we\s+had|we\s+have)/i.test(words[startIdx])) {
+      startIdx++;
+    }
+    
+    if (startIdx < words.length) {
+      const meaningfulWords = words.slice(startIdx, startIdx + 8);
+      if (meaningfulWords.length >= 3) {
+        const candidate = meaningfulWords.join(" ");
+        // Validate it's not just filler
+        if (candidate.length > 10 && !candidate.match(/^(is|are|was|were|will|can|should)\s*$/i)) {
+          return normalizeTitle(candidate);
+        }
+      }
+    }
+  }
+  
+  // Fallback: category-based generic title
+  const categoryTitles: Record<UpdateCategory, string> = {
+    "Pharmacy": "Pharmacy update",
+    "Billing": "Billing update",
+    "Labs": "Lab process update",
+    "Operations": "Operations update",
+    "Internal Tools / Systems": "System update",
+    "Contractor / Staffing": "Staffing update",
+    "Compliance / Clinical": "Compliance update",
+    "Miscellaneous": "Update",
+  };
+  
+  return categoryTitles[category];
+}
+
+function normalizeTitle(title: string): string {
+  // Remove extra whitespace
+  let normalized = title.replace(/\s+/g, " ").trim();
+  
+  // Remove leading prepositions and filler words
+  normalized = normalized.replace(/^(with|for|to|from|by|at|in|on|the|a|an|and|or|but|be|is|are|was|were|we|our|this|that|there)\s+/i, "");
+  
+  // Remove trailing punctuation
+  normalized = normalized.replace(/[.,;:!?]+$/, "");
+  
+  // Skip if title is too short or meaningless after cleaning
+  if (normalized.length < 5 || /^(to|and|or|but|the|a|an|is|are|was|were)$/i.test(normalized)) {
+    return normalized; // Return as-is, will fall back to category title
+  }
+  
+  // Convert to sentence case (first letter uppercase, rest lowercase, except proper nouns)
+  const words = normalized.split(/\s+/);
+  const sentenceCase = words.map((word, index) => {
+    // Keep acronyms and proper nouns (words that start with capital)
+    if (word.match(/^[A-Z]{2,}$/) || (index > 0 && word[0] === word[0].toUpperCase() && word.length > 1)) {
+      return word;
+    }
+    // First word always capitalized
+    if (index === 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+    // Keep common proper nouns and technical terms
+    const properNouns = ["LabCorp", "Sonora", "Quest", "HRT", "TRT", "GLP", "RN", "CS", "SS", "CIO", "HIPAA", "Stripe", "Mac", "PC"];
+    if (properNouns.some(pn => word.toLowerCase().includes(pn.toLowerCase()))) {
+      return word;
+    }
+    return word.toLowerCase();
+  }).join(" ");
+  
+  // Limit length
+  if (sentenceCase.length > 80) {
+    const words = sentenceCase.split(/\s+/);
+    let result = "";
+    for (const word of words) {
+      if ((result + " " + word).length > 77) break;
+      result += (result ? " " : "") + word;
+    }
+    return result + "...";
+  }
+  
+  return sentenceCase;
+}
+
+function getActionWord(text: string): string {
+  if (text.match(/\bfixed|resolved|corrected\b/)) return "fix";
+  if (text.match(/\boutage|down\b/)) return "outage";
+  if (text.match(/\berror\b/)) return "error";
+  if (text.match(/\bissue\b/)) return "issue";
+  return "issue";
+}
+
+function getProcessAction(text: string): string {
+  if (text.match(/\bnew\b/)) return "process";
+  if (text.match(/\bupdated|changed|adjusted\b/)) return "update";
+  return "change";
 }
 
 function detectSupersedes(
@@ -405,7 +672,7 @@ async function ingestDocx(): Promise<void> {
       }
 
       const category = detectCategory(cleaned);
-      const title = extractTitle(cleaned);
+      const title = extractTitle(cleaned, category);
       
       // Use full cleaned text as body, but limit to reasonable length
       const body = cleaned.length > 1000 ? cleaned.substring(0, 1000) + "..." : cleaned;

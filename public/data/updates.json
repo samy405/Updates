@@ -1,11 +1,11 @@
 {
   "updates": [
     {
-      "id": "20260128-hi-channel-we-had-an-error-occur-with-our-lab-sche",
+      "id": "20260128-with-our-lab-scheduling-fix",
       "datePosted": "2026-01-28",
       "author": "Camryn Burden",
       "category": "Labs",
-      "title": "Hi @channel we had an error occur with our lab scheduling for patient's who comp",
+      "title": "With our lab scheduling fix",
       "body": "Camryn Burden Hi @channel we had an error occur with our lab scheduling for patient's who completed their booking between the dates of 12/15/25- 1/2/26. The system replaced their legal name on the booking with \"Testy Mr Tester\". However, the lab order has the correct legal name. Many patient's have still been able to proceed with their lab appointment despite this hiccup.If anyone reaches out and states the lab is unable to locate their name/booking or their booking is under \"Testy Mr Tester\" please send the following macro. If any escalations occur regarding this matter please defer to the shift supervisor team.Title: Testy Mr Tester Lab Booking error causing lab to not be able to find the patient booking Appointment bookings were made between 12/15-1/2\"Hi there, we recently experienced a technical issue that caused our system to override the patient's name while booking their lab appointment. This issue has since been resolved, and should not affect future bookings.If you would still...",
       "sourceExcerpt": "Camryn Burden Hi @channel we had an error occur with our lab scheduling for patient's who completed their booking between the dates of 12/15/25- 1/2/26. The system replaced their legal name on the booking with \"Testy Mr Tester\". However, the lab orde...",
       "supersedesIds": [],
@@ -14,11 +14,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-per-tech-this-should-be-fixed",
+      "id": "20260128-technical-issue-resolved",
       "datePosted": "2026-01-28",
       "author": "Lindsay Burden",
       "category": "Miscellaneous",
-      "title": "Per tech this should be fixed.",
+      "title": "Technical issue resolved",
       "body": "Lindsay Burden replied to a thread: Per tech this should be fixed. Please update if this is still occurring today onwards. @Celeste Carzon @Pierre Bragas",
       "sourceExcerpt": "Lindsay Burden replied to a thread: Per tech this should be fixed. Please update if this is still occurring today onwards. @Celeste Carzon @Pierre Bragas",
       "supersedesIds": [],
@@ -27,11 +27,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-there-appears-to-be-a-routing-error-when-a-new-sub",
+      "id": "20260128-be-a-routing-error",
       "datePosted": "2026-01-28",
       "author": "Lindsay Burden",
       "category": "Billing",
-      "title": "There appears to be a routing error when a new subscription occurs.",
+      "title": "Be a routing error",
       "body": "Lindsay Burden @channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of the issue. Thank you!",
       "sourceExcerpt": "Lindsay Burden @channel There appears to be a routing error when a new subscription occurs. It is going to the Billing Team instead of the MA team. If you are assigned a new subscription ticket, please reassign this to the MA team. Tech is aware of t...",
       "supersedesIds": [],
@@ -40,11 +40,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-important-reminders-and-updates",
+      "id": "20260128-and-updates",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Pharmacy",
-      "title": "Important reminders and updates.",
+      "title": "And updates",
       "body": "Jessica Booker @channel Important reminders and updates. Please give a thumbs up when you have reviewed the following:-Employment VerificationIf we receive a call from someone wanting employment verification with the company, please give them Lindsay’s email: lindsay@fountain.net*** We do not provide employment verifications over the phone. ***-Subscription Add OnsWhen a patient reaches out about starting an add on medication, please reassign this to the RN team. The following steps will then be taken by the RN’s: If the add on was not discussed, the RN will redirect ticket to the provider. If medication was discussed/approved by the provider during VV the RN may send subscription link. -3rd party communication for translationAs advised previously on these matters, if a family member attempts to reach out regarding the patient we SHOULD NOT confirm/deny if the mentioned patient is our patient. We are unable to communicate with anyone other than the patient for HIPAA compliance. We shou...",
       "sourceExcerpt": "Jessica Booker @channel Important reminders and updates. Please give a thumbs up when you have reviewed the following:-Employment VerificationIf we receive a call from someone wanting employment verification with the company, please give them Lindsay...",
       "supersedesIds": [],
@@ -53,11 +53,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-important-reminder-regarding-the-lab-scheduling-is",
+      "id": "20260128-regarding-the-lab-scheduling-issues",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Labs",
-      "title": "Important reminder regarding the lab scheduling issues.",
+      "title": "Regarding the lab scheduling issues",
       "body": "Jessica Booker @channel Important reminder regarding the lab scheduling issues. Please remember that we do not want to create work arounds for any of these situations. We should not manually schedule any labs outside of Sonora Quest. If a patient is having issues utilizing the lab scheduling links, please continue to take the following steps: Post to the Tech Channel in Slack Snooze to monitor and try again the next day Tech is working diligently to correct the issues. In the meantime we do not want to cause more errors by creating these workarounds.",
       "sourceExcerpt": "Jessica Booker @channel Important reminder regarding the lab scheduling issues. Please remember that we do not want to create work arounds for any of these situations. We should not manually schedule any labs outside of Sonora Quest. If a patient is ...",
       "supersedesIds": [],
@@ -66,11 +66,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-i-appreciate-you-all-jumping-on-today",
+      "id": "20260128-modificationslab-scheduling-technical-error",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Pharmacy",
-      "title": "I appreciate you all jumping on today!",
+      "title": "Modificationslab Scheduling Technical error",
       "body": "Jessica Booker @channel I appreciate you all jumping on today! Please let me know if you need time added to your schedule for joining the meeting while OOO. For those who were not available, here is the summary. Please let me know if you have any questions. Ya'll are doing a great job and are so appreciated!Front Office SyncFri, 09 Jan 26Employment Verification Process• Cannot provide employment verification over phone due to security concernsRecent increase in spam calls and identity theft attemptsMust direct all requests to Lindsay’s email: Lindsay@fountain.net• Lindsay is only authorized person for employment verificationVideo Visit Changes• All video visits now standardized to 20-minute slotsApplies to HRT, TRT, and GLP appointmentsAlready implemented beginning of this weekMedication & Treatment Change Workflow• New process: defer all requests to RN team instead of CS verificationAdd-on medications (anastrozole, tadalafil, enclomiphene)Treatment option switches (cream to injectable...",
       "sourceExcerpt": "Jessica Booker @channel I appreciate you all jumping on today! Please let me know if you need time added to your schedule for joining the meeting while OOO. For those who were not available, here is the summary. Please let me know if you have any que...",
       "supersedesIds": [],
@@ -79,11 +79,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-per-tech-the-labcorp-issue-should-be-fixed",
+      "id": "20260128-labcorp-please-post-in-fix",
       "datePosted": "2026-01-28",
       "author": "Lindsay Burden",
       "category": "Labs",
-      "title": "per tech the Labcorp issue should be fixed.",
+      "title": "Labcorp please post in fix",
       "body": "Lindsay Burden @channel per tech the Labcorp issue should be fixed. If you continue to have any patients have the same ongoing issue with Labcorp please post in the tech_cs channel. Have a great weekend all!",
       "sourceExcerpt": "Lindsay Burden @channel per tech the Labcorp issue should be fixed. If you continue to have any patients have the same ongoing issue with Labcorp please post in the tech_cs channel. Have a great weekend all!",
       "supersedesIds": [],
@@ -92,11 +92,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-just-wanting-to-check-in-with-everyone-regarding-t",
+      "id": "20260128-i-haven-t-seen-many-posts-regarding-lab-link",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Labs",
-      "title": "Just wanting to check in with everyone regarding the lab links.",
+      "title": "I haven't seen many posts regarding lab link",
       "body": "Jessica Booker Just wanting to check in with everyone regarding the lab links. How is everything going? I haven't seen many posts regarding lab link issues in the tech channel since Saturday. Please make sure you are reaching out to any patients who we may have snoozed to have them try to use the link to schedule again. Thank you!",
       "sourceExcerpt": "Jessica Booker Just wanting to check in with everyone regarding the lab links. How is everything going? I haven't seen many posts regarding lab link issues in the tech channel since Saturday. Please make sure you are reaching out to any patients who ...",
       "supersedesIds": [],
@@ -105,11 +105,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-good-morning-channel",
+      "id": "20260128-progesterone-sublingual-300-mg-for-policy-change",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Billing",
-      "title": "Good morning @channel.",
+      "title": "Progesterone sublingual 300 mg for policy change",
       "body": "Jessica Booker Good morning @channel. We have some Updates and Reminders for the day. Please review.UPDATES-Sublingual Progesterone 300mg We will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients will be receiving a blast message letting them know about the change. If a patient has any additional questions from the message they receive, please defer to the SS team -HRT Labs not required for specific patients We have successfully been seeing New York HRT patients with no labs for several weeks now. We are going to broaden the pilot program to several other patients in different states. Please ALWAYS first check to see if a lab order was generated. If no lab order was generated, that means they are part of our no labs pilot program. Please do not offer labs to these patients. -Charge cost of labs if outside of a subscription In the following two scenarios we will manually charge the patient a $35 fee for lab work. (Additional charges...",
       "sourceExcerpt": "Jessica Booker Good morning @channel. We have some Updates and Reminders for the day. Please review.UPDATES-Sublingual Progesterone 300mg We will no longer be offering progesterone sublingual 300 mg for new patients or for follow-ups and the patients...",
       "supersedesIds": [],
@@ -118,11 +118,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-hey-channel",
+      "id": "20260128-to-you",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Pharmacy",
-      "title": "Hey @channel.",
+      "title": "To you",
       "body": "Jessica Booker Hey @channel. Sorry it has taken me half the day to get these updates to you. I got a new work computer this week and its completely out of my realm (its a Mac) so its taking me a minute to adjust to everything. As always, I appreciate you all and your amazing work! Please leave me a reaction on this post once you review.REMINDER-Email Lab order requestsWhen a patient requests to have a lab order emailed to them, please create a ticket for the SS. This will allow for the ticket to stay in the SS inbox if the patient continues to reply in the conversation.UPDATES-Cancellation ReasonsWe are adjusting our cancellation workflow. When a patient states that they would like to cancel, CS please send the macro titled: Cancellation Reason Request: \"Our team has received your cancellation request. Before we make the appropriate adjustments to your account please share if any particular reason contributed to your decision to cancel your subscription. We would like to see if there i...",
       "sourceExcerpt": "Jessica Booker Hey @channel. Sorry it has taken me half the day to get these updates to you. I got a new work computer this week and its completely out of my realm (its a Mac) so its taking me a minute to adjust to everything. As always, I appreciate...",
       "supersedesIds": [],
@@ -131,11 +131,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-in-regard-to-the-update-above-for-our-new-cancella",
+      "id": "20260128-above-for-our-new-cancellation-workflow",
       "datePosted": "2026-01-28",
       "author": "Camryn Burden",
       "category": "Operations",
-      "title": "In regard to the update above for our new cancellation workflow.",
+      "title": "Above for our new cancellation workflow",
       "body": "Camryn Burden In regard to the update above for our new cancellation workflow. CS does not need to process cancellation in stripe. Once reason for cancellation request has been provided by the patient, send the matter to Shift Supervisor team. They will proceed with cancellation if appropriate. Thanks! @channel",
       "sourceExcerpt": "Camryn Burden In regard to the update above for our new cancellation workflow. CS does not need to process cancellation in stripe. Once reason for cancellation request has been provided by the patient, send the matter to Shift Supervisor team. They w...",
       "supersedesIds": [],
@@ -144,11 +144,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-last-night-there-was-a-brief-outage-while-we-were-",
+      "id": "20260128-was-a-brief-outage",
       "datePosted": "2026-01-28",
       "author": "Lindsay Burden",
       "category": "Labs",
-      "title": ", last night there was a brief outage while we were making updates for HRT patie",
+      "title": "Was a brief outage",
       "body": "Lindsay Burden @channel, last night there was a brief outage while we were making updates for HRT patients, no labs funnel. If HRT patients are having problems with checkout. Please have them try the following hard refresh the page “ctrl + shift + R” on PC, “cmmd + shift + R” on mac.You can explain that there was a recent update, and if they can try to refresh their page",
       "sourceExcerpt": "Lindsay Burden @channel, last night there was a brief outage while we were making updates for HRT patients, no labs funnel. If HRT patients are having problems with checkout. Please have them try the following hard refresh the page “ctrl + shift + R”...",
       "supersedesIds": [],
@@ -157,11 +157,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-tech-is-currently-working-to-fix-the-subscription-",
+      "id": "20260128-the-subscription-checkout-issue",
       "datePosted": "2026-01-28",
       "author": "Jessica Booker",
       "category": "Miscellaneous",
-      "title": "Tech is currently working to fix the subscription checkout issue.",
+      "title": "The subscription checkout issue",
       "body": "Jessica Booker @channel Tech is currently working to fix the subscription checkout issue. Anyone who has had an issue, please have the patients retry in about one to two hours to confirm that it is working",
       "sourceExcerpt": "Jessica Booker @channel Tech is currently working to fix the subscription checkout issue. Anyone who has had an issue, please have the patients retry in about one to two hours to confirm that it is working",
       "supersedesIds": [],
@@ -170,11 +170,11 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-hi-channel-there-was-an-erroneous-message-automati",
+      "id": "20260128-was-sent-in-fix",
       "datePosted": "2026-01-28",
       "author": "Camryn Burden",
       "category": "Labs",
-      "title": "Hi @channel there was an erroneous message automatically sent out by CIO to HRT ",
+      "title": "Was sent in fix",
       "body": "Camryn Burden Hi @channel there was an erroneous message automatically sent out by CIO to HRT patient's who completed there eval stating: \"Hi there, welcome to Fountain – glad to have you here! The next step is scheduling your lab appointment. What times/dates would be good for you to go into a nearby lab for a blood test?\"This was sent in error. Labs were not included at check out for these patient's as previously discussed. Rob has fixed this system error. Please send the following macro to these patient's with their VV scheduling link. Thanks!Title: System Error causing lab scheduling message to send to HRT sign ups after 1/21/26\"Hi there, we apologize for the confusion—our system sent the previous message regarding lab scheduling in error.At this time, the next step is to schedule your initial video visit with one of our providers. If you haven’t already done so, please use the link below to book your appointment:[Insert scheduling link]We look forward to speaking with you soon!\"",
       "sourceExcerpt": "Camryn Burden Hi @channel there was an erroneous message automatically sent out by CIO to HRT patient's who completed there eval stating: \"Hi there, welcome to Fountain – glad to have you here! The next step is scheduling your lab appointment. What t...",
       "supersedesIds": [],

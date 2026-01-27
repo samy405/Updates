@@ -82,11 +82,6 @@ export default function Home() {
 
   return (
     <div className="home">
-      <header className="home-header">
-        <h1>CS Updates</h1>
-        <p className="subheader">Procedural and operational updates for the team</p>
-      </header>
-
       <div className="category-tabs">
         <button
           className={`category-tab ${selectedCategory === "All" ? "active" : ""}`}
