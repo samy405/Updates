@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Update, UpdateCategory, UpdatesData } from "../types";
+import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
 import "./Home.css";
 

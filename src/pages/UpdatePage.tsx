@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Update, UpdatesData } from "../types";
+import type { Update, UpdatesData } from "../types";
 import "./UpdatePage.css";
 
 export default function UpdatePage() {
