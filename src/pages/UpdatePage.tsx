@@ -23,6 +23,10 @@ export default function UpdatePage() {
   const [commentError, setCommentError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState<number | null>(null);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingBody, setEditingBody] = useState("");
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [deleteInProgressId, setDeleteInProgressId] = useState<string | null>(null);
   const update = updates.find((u) => u.id === id);
 
   useEffect(() => {
@@ -42,33 +46,32 @@ export default function UpdatePage() {
     loadUpdates();
   }, []);
 
-  // Load comments for this update
-  useEffect(() => {
+  const reloadComments = async () => {
     if (!supabase || !update) return;
 
-    const client = supabase; // Narrowed non-null reference for TypeScript
+    setCommentsLoading(true);
+    setCommentError(null);
 
-    const loadComments = async () => {
-      setCommentsLoading(true);
-      setCommentError(null);
+    const { data, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("update_id", update.id)
+      .order("created_at", { ascending: true });
 
-      const { data, error } = await client
-        .from("comments")
-        .select("*")
-        .eq("update_id", update.id)
-        .order("created_at", { ascending: true });
+    if (error) {
+      console.error("Failed to load comments:", error);
+      setCommentError("Failed to load comments. Please try again later.");
+    } else if (data) {
+      setComments(data as Comment[]);
+    }
 
-      if (error) {
-        console.error("Failed to load comments:", error);
-        setCommentError("Failed to load comments. Please try again later.");
-      } else if (data) {
-        setComments(data as Comment[]);
-      }
+    setCommentsLoading(false);
+  };
 
-      setCommentsLoading(false);
-    };
-
-    loadComments();
+  // Load comments for this update
+  useEffect(() => {
+    reloadComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [update]);
 
   useEffect(() => {
@@ -169,19 +172,71 @@ export default function UpdatePage() {
     setCommentBody("");
     setLastSubmitTime(now);
 
-    const { data: refreshed, error: refreshError } = await supabase
-      .from("comments")
-      .select("*")
-      .eq("update_id", update.id)
-      .order("created_at", { ascending: true });
+    await reloadComments();
+    setSubmitting(false);
+  };
 
-    if (refreshError) {
-      console.error("Failed to refresh comments:", refreshError);
-    } else if (refreshed) {
-      setComments(refreshed as Comment[]);
+  const startEditingComment = (comment: Comment) => {
+    setEditingCommentId(comment.id);
+    setEditingBody(comment.body);
+    setCommentError(null);
+  };
+
+  const cancelEditingComment = () => {
+    setEditingCommentId(null);
+    setEditingBody("");
+  };
+
+  const handleSaveEdit = async (commentId: string) => {
+    if (!supabase || !update) return;
+
+    const trimmed = editingBody.trim();
+    if (!trimmed) {
+      setCommentError("Comment cannot be empty.");
+      return;
     }
 
-    setSubmitting(false);
+    setEditSubmitting(true);
+    setCommentError(null);
+
+    const { error } = await supabase
+      .from("comments")
+      .update({ body: trimmed })
+      .eq("id", commentId);
+
+    if (error) {
+      console.error("Failed to update comment:", error);
+      setCommentError("Failed to update comment. Please try again.");
+      setEditSubmitting(false);
+      return;
+    }
+
+    setEditingCommentId(null);
+    setEditingBody("");
+    await reloadComments();
+    setEditSubmitting(false);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!supabase || !update) return;
+
+    const confirmed = window.confirm("Delete this comment?");
+    if (!confirmed) return;
+
+    setDeleteInProgressId(commentId);
+    setCommentError(null);
+
+    const { error } = await supabase.from("comments").delete().eq("id", commentId);
+
+    if (error) {
+      console.error("Failed to delete comment:", error);
+      setCommentError("Failed to delete comment. Please try again.");
+      setDeleteInProgressId(null);
+      return;
+    }
+
+    await reloadComments();
+    setDeleteInProgressId(null);
   };
 
   return (
@@ -282,7 +337,55 @@ export default function UpdatePage() {
                             {comment.name?.trim() || "Anonymous"}
                           </span>
                         </div>
-                        <p className="comment-body">{comment.body}</p>
+                        {editingCommentId === comment.id ? (
+                          <>
+                            <textarea
+                              className="comment-edit-textarea"
+                              value={editingBody}
+                              onChange={(e) => setEditingBody(e.target.value)}
+                              rows={3}
+                            />
+                            <div className="comment-actions">
+                              <button
+                                type="button"
+                                className="btn btn-primary btn-small"
+                                onClick={() => handleSaveEdit(comment.id)}
+                                disabled={editSubmitting}
+                              >
+                                {editSubmitting ? "Saving..." : "Save"}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-link btn-small"
+                                onClick={cancelEditingComment}
+                                disabled={editSubmitting}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <p className="comment-body">{comment.body}</p>
+                            <div className="comment-actions">
+                              <button
+                                type="button"
+                                className="btn-link btn-small"
+                                onClick={() => startEditingComment(comment)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-link btn-small comment-delete"
+                                onClick={() => handleDeleteComment(comment.id)}
+                                disabled={deleteInProgressId === comment.id}
+                              >
+                                {deleteInProgressId === comment.id ? "Deleting..." : "Delete"}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </li>
                     ))}
                   </ul>
