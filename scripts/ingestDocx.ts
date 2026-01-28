@@ -141,7 +141,7 @@ function detectCategory(text: string): UpdateCategory {
 /**
  * Checks if a sub-update is mixed (contains multiple strong topics)
  */
-function isMixedTopic(text: string): boolean {
+export function isMixedTopic(text: string): boolean {
   const { scores } = classifyWithScores(text);
   const topScore = scores[0].score;
   const secondScore = scores[1]?.score || 0;
@@ -162,7 +162,7 @@ function isMixedTopic(text: string): boolean {
  * - Topic shift keywords
  * - Blank-line separation with topic changes
  */
-function splitBlockIntoSubUpdates(block: string): string[] {
+export function splitBlockIntoSubUpdates(block: string): string[] {
   const subUpdates: string[] = [];
   const lines = block.split("\n");
   
@@ -267,7 +267,7 @@ function splitBlockIntoSubUpdates(block: string): string[] {
 /**
  * Splits a mixed sub-update further to achieve topic purity
  */
-function splitMixedSubUpdate(text: string): string[] {
+export function splitMixedSubUpdate(text: string): string[] {
   const parts: string[] = [];
   const lines = text.split("\n");
   
@@ -340,7 +340,7 @@ function splitMixedSubUpdate(text: string): string[] {
 /**
  * Detects if a block likely contains multiple topics that should be split
  */
-function detectMultipleTopics(block: string): boolean {
+export function detectMultipleTopics(block: string): boolean {
   // Use scoring system to detect multiple topics
   const { scores } = classifyWithScores(block);
   const topScore = scores[0].score;
@@ -375,7 +375,7 @@ function detectMultipleTopics(block: string): boolean {
  * 4) an escalation owner or responsibility
  * 5) a lasting operational instruction
  */
-function isUpdate(text: string): boolean {
+export function isUpdate(text: string): boolean {
   const lowerText = text.toLowerCase();
   const trimmed = text.trim();
 
@@ -446,7 +446,7 @@ function isUpdate(text: string): boolean {
 
 // NOTE: extractUpdatePortions function removed - we now use "end of update" delimiter for splitting
 
-function extractAuthor(text: string): string {
+export function extractAuthor(text: string): string {
   // Common Slack paste formats:
   // "Author Name [timestamp]" or "Author Name:" or "Author Name -" or "Author Name at 10:30 AM"
   const patterns = [
@@ -1011,7 +1011,7 @@ function getActionWord(text: string): string {
 }
 
 
-function detectSupersedes(
+export function detectSupersedes(
   text: string,
   existingUpdates: Update[]
 ): string[] {
@@ -1085,7 +1085,7 @@ function preserveStructure(text: string): string {
 /**
  * Validates that an update doesn't end mid-sentence or mid-word
  */
-function validateUpdateCompleteness(text: string): boolean {
+export function validateUpdateCompleteness(text: string): boolean {
   const trimmed = text.trim();
   if (trimmed.length === 0) return false;
   
@@ -1119,7 +1119,7 @@ function validateUpdateCompleteness(text: string): boolean {
 /**
  * Removes non-update chatter (greetings, appreciation) while preserving instructions
  */
-function removeChatter(text: string): string {
+export function removeChatter(text: string): string {
   const lines = text.split("\n");
   const cleaned: string[] = [];
   let foundUpdateContent = false;
@@ -1172,6 +1172,15 @@ async function ingestDocx(): Promise<void> {
   const rawText = result.value;
   console.log(`✓ Extracted ${rawText.length} characters from document`);
 
+  // Fallback date: if we can't parse explicit date headings, use DOCX modified time
+  let fallbackDate: Date;
+  try {
+    const stats = fs.statSync(DOCX_FILE);
+    fallbackDate = stats.mtime;
+  } catch {
+    fallbackDate = new Date();
+  }
+
   // NEW PIPELINE: pre-categorized DOCX is the single source of truth.
   // We will rebuild the dataset from scratch using:
   // - Date headings for top-level batch dates
@@ -1206,12 +1215,26 @@ async function ingestDocx(): Promise<void> {
   let currentDate: Date | null = null;
   let currentCategory: UpdateCategory = "Miscellaneous";
   let currentBlockLines: string[] = [];
+  let usedFallbackDate = false;
 
   const flushCurrentBlock = () => {
     const rawBody = currentBlockLines.join("\n").trim();
-    if (!rawBody || !currentDate) {
+    if (!rawBody) {
       currentBlockLines = [];
       return;
+    }
+
+    // Determine effective date: prefer parsed heading, else fallback
+    let effectiveDate = currentDate;
+    if (!effectiveDate) {
+      effectiveDate = fallbackDate;
+      if (!usedFallbackDate) {
+        console.warn(
+          "No date headings detected before first update block. " +
+            "Using DOCX modified time as the batch date for grouping."
+        );
+        usedFallbackDate = true;
+      }
     }
 
     // Normalize but do not paraphrase
@@ -1219,7 +1242,7 @@ async function ingestDocx(): Promise<void> {
     body = preserveStructure(body);
     body = cleanSlackText(body);
 
-    const dateStr = currentDate.toISOString().split("T")[0];
+    const dateStr = effectiveDate.toISOString().split("T")[0];
 
     const title = extractTitle(body, currentCategory);
     const sourceExcerpt = body.length > 300 ? body.substring(0, 300) + "..." : body;
@@ -1349,8 +1372,11 @@ async function ingestDocx(): Promise<void> {
   fs.writeFileSync(DATA_FILE_SOURCE, JSON.stringify(outputData, null, 2), "utf-8");
 
   console.log("Ingestion complete (new pipeline).");
+  // The new pipeline is the single source of truth for the dataset.
+  // Early-return here so legacy code below is never executed.
+  return;
 
-  // === LEGACY PIPELINE (kept for reference/debug only) ===
+  /* === LEGACY PIPELINE (kept for reference/debug only, not executed) ===
   // NOTE: Uses separate variable names to avoid collisions with the new pipeline.
   console.log("Loading existing updates (legacy pipeline, not used for main output)...");
   let existingData: UpdatesData;
@@ -1448,7 +1474,7 @@ async function ingestDocx(): Promise<void> {
     block = block.split("\n").filter(line => !parseDateHeading(line.trim())).join("\n").trim();
     
     // Remove "end of update" text if it appears in the block
-    block = block.replace(/\s*end\s+of\s+update\s*/gi, "").trim();
+    block = block.replace(new RegExp("\\s*end\\s+of\\s+update\\s*", "gi"), "").trim();
     
     // LEVEL 2: Split block into sub-updates if multiple topics detected
     const hasMultipleTopics = detectMultipleTopics(block);
@@ -1674,7 +1700,7 @@ async function ingestDocx(): Promise<void> {
     console.warn("  2. Updates meet the strict definition criteria");
     console.warn("  3. Date headings are properly formatted");
   }
-}
+*/}
 
 ingestDocx().catch((error) => {
   console.error("Error during ingestion:", error);
