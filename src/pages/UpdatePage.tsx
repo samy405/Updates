@@ -79,15 +79,6 @@ export default function UpdatePage() {
     );
   }
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   const supersededUpdate = update.supersededById
     ? updates.find((u) => u.id === update.supersededById)
     : null;
@@ -112,14 +103,6 @@ export default function UpdatePage() {
             </div>
             <div className="update-meta">
               <span className="update-meta-item">
-                <span className="update-meta-label">Date:</span>
-                <span className="update-meta-value">{formatDate(update.datePosted)}</span>
-              </span>
-              <span className="update-meta-item">
-                <span className="update-meta-label">Author:</span>
-                <span className="update-meta-value">{update.author}</span>
-              </span>
-              <span className="update-meta-item">
                 <span className="update-meta-label">Category:</span>
                 <span className="update-meta-value">{update.category}</span>
               </span>
@@ -131,7 +114,7 @@ export default function UpdatePage() {
               <p>
                 <strong>Note:</strong> This update has been superseded.{" "}
                 <Link to={`/update/${update.supersededById}`}>
-                  View replacement update from {formatDate(supersededUpdate.datePosted)} →
+                  View replacement update →
                 </Link>
               </p>
             </div>
@@ -149,9 +132,7 @@ export default function UpdatePage() {
                   const superseded = updates.find((u) => u.id === supersededId);
                   return superseded ? (
                     <li key={supersededId}>
-                      <Link to={`/update/${supersededId}`}>
-                        {superseded.title} ({formatDate(superseded.datePosted)})
-                      </Link>
+                      <Link to={`/update/${supersededId}`}>{superseded.title}</Link>
                     </li>
                   ) : null;
                 })}

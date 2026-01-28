@@ -28,16 +28,8 @@ export default function UpdateCard({ update }: UpdateCardProps) {
         </div>
         <div className="update-card-meta">
           <span className="update-meta-item">
-            <span className="update-meta-label">Author:</span>
-            <span className="update-author">{update.author}</span>
-          </span>
-          <span className="update-meta-item">
             <span className="update-meta-label">Category:</span>
             <span className="update-category">{update.category}</span>
-          </span>
-          <span className="update-meta-item">
-            <span className="update-meta-label">Date:</span>
-            <span className="update-date">{new Date(update.datePosted).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
           </span>
         </div>
       </div>
