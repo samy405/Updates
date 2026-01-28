@@ -14,10 +14,15 @@ const CATEGORIES: UpdateCategory[] = [
   "Miscellaneous",
 ];
 
+// Normalize category strings for robust comparison
+function normalizeCategory(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<UpdateCategory | "All">("All");
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
-  const [updates, setUpdates] = useState<Update[]>([]);
+  const [allUpdates, setAllUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,7 +36,7 @@ export default function Home() {
       })
       .then((data: UpdatesData) => {
         console.log(`Loaded ${data.updates.length} updates from /data/updates.json`);
-        setUpdates(data.updates);
+        setAllUpdates(data.updates);
         setLoading(false);
       })
       .catch((err) => {
@@ -42,10 +47,13 @@ export default function Home() {
 
   const filteredUpdates = useMemo(() => {
     if (selectedCategory === "All") {
-      return updates;
+      return allUpdates;
     }
-    return updates.filter((update) => update.category === selectedCategory);
-  }, [updates, selectedCategory]);
+    const target = normalizeCategory(selectedCategory);
+    return allUpdates.filter(
+      (update) => normalizeCategory(update.category) === target
+    );
+  }, [allUpdates, selectedCategory]);
 
   // Group updates by date
   const updatesByDate = useMemo(() => {
@@ -111,7 +119,7 @@ export default function Home() {
           <div className="empty-state">
             <p>Loading updates...</p>
           </div>
-        ) : updates.length === 0 ? (
+        ) : allUpdates.length === 0 ? (
           <div className="empty-state">
             <p>No updates found. Please run <code>npm run ingest</code> to populate updates.</p>
             <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.5rem" }}>
