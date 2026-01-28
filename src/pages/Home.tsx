@@ -14,6 +14,9 @@ const CATEGORIES: UpdateCategory[] = [
   "Miscellaneous",
 ];
 
+// Debug flag for category audit panel
+const SHOW_DEBUG = true;
+
 // Normalize category strings for robust comparison
 function normalizeCategory(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
@@ -55,7 +58,7 @@ export default function Home() {
     );
   }, [allUpdates, selectedCategory]);
 
-  // Group updates by date
+  // Group updates by date (derived from filteredUpdates only)
   const updatesByDate = useMemo(() => {
     const grouped: Record<string, Update[]> = {};
     for (const update of filteredUpdates) {
@@ -64,7 +67,7 @@ export default function Home() {
       }
       grouped[update.datePosted].push(update);
     }
-    // Sort dates descending
+    // Sort dates descending (work on a copy of entries)
     return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
   }, [filteredUpdates]);
 
@@ -105,6 +108,24 @@ export default function Home() {
     renderedLen: renderedList.length,
     renderedCats: renderedList.slice(0, 5).map((u) => u.category),
   });
+
+  // Category audit: counts by exact category string in data
+  const categoryAudit = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const u of allUpdates) {
+      const key = (u.category ?? "") as string;
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    const canonicalSet = new Set(CATEGORIES.map((c) => normalizeCategory(c)));
+    const entries = Object.entries(counts).map(([raw, count]) => {
+      const isCanonical = canonicalSet.has(normalizeCategory(raw));
+      const label = isCanonical ? raw : `OTHER("${raw}")`;
+      return { label, count };
+    });
+    // Stable display
+    entries.sort((a, b) => a.label.localeCompare(b.label));
+    return { total: allUpdates.length, entries };
+  }, [allUpdates]);
 
   return (
     <div className="home">
@@ -149,6 +170,19 @@ export default function Home() {
                 {filteredUpdates.length} {filteredUpdates.length === 1 ? "update" : "updates"}
                 {selectedCategory !== "All" && ` in ${selectedCategory}`}
               </p>
+              {SHOW_DEBUG && (
+                <div className="updates-debug">
+                  <strong>Debug categories</strong>
+                  <div>Total: {categoryAudit.total}</div>
+                  <ul>
+                    {categoryAudit.entries.map((e) => (
+                      <li key={e.label}>
+                        {e.label}: {e.count}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             {updatesByDate.map(([date, dateUpdates]) => (
             <div key={date} className="date-group">
@@ -167,7 +201,7 @@ export default function Home() {
               </button>
               {expandedDates.has(date) && (
                 <div className="date-updates">
-                  {dateUpdates
+                  {[...dateUpdates]
                     .sort((a, b) => {
                       // Show active updates first, then superseded
                       if (a.status !== b.status) {
