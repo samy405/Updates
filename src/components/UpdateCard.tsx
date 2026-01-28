@@ -62,7 +62,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
         <Link to={`/update/${update.id}`} className="btn btn-primary">
           View
         </Link>
-        <Link to={`/update/${update.id}`} className="btn btn-secondary">
+        <Link to={`/update/${update.id}#comments`} className="btn btn-secondary">
           Discuss
         </Link>
       </div>

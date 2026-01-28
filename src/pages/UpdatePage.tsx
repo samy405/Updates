@@ -1,27 +1,75 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Update, UpdatesData } from "../types";
+import { supabase } from "../utils/supabaseClient";
 import "./UpdatePage.css";
+
+interface Comment {
+  id: string;
+  update_id: string;
+  name: string | null;
+  body: string;
+  created_at: string;
+}
 
 export default function UpdatePage() {
   const { id } = useParams<{ id: string }>();
   const [updates, setUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentName, setCommentName] = useState("");
+  const [commentBody, setCommentBody] = useState("");
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState<number | null>(null);
   const update = updates.find((u) => u.id === id);
 
   useEffect(() => {
     // Load updates data
-    fetch("/data/updates.json")
-      .then((res) => res.json())
-      .then((data: UpdatesData) => {
+    const loadUpdates = async () => {
+      try {
+        const res = await fetch("/data/updates.json");
+        const data: UpdatesData = await res.json();
         setUpdates(data.updates);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to load updates:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadUpdates();
   }, []);
+
+  // Load comments for this update
+  useEffect(() => {
+    if (!supabase || !update) return;
+
+    const client = supabase; // Narrowed non-null reference for TypeScript
+
+    const loadComments = async () => {
+      setCommentsLoading(true);
+      setCommentError(null);
+
+      const { data, error } = await client
+        .from("comments")
+        .select("*")
+        .eq("update_id", update.id)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Failed to load comments:", error);
+        setCommentError("Failed to load comments. Please try again later.");
+      } else if (data) {
+        setComments(data as Comment[]);
+      }
+
+      setCommentsLoading(false);
+    };
+
+    loadComments();
+  }, [update]);
 
   useEffect(() => {
     // Load giscus script
@@ -82,6 +130,59 @@ export default function UpdatePage() {
   const supersededUpdate = update.supersededById
     ? updates.find((u) => u.id === update.supersededById)
     : null;
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabase || !update) return;
+
+    const now = Date.now();
+    if (lastSubmitTime && now - lastSubmitTime < 2000) {
+      // Simple client-side rate limit: 2 seconds between posts
+      return;
+    }
+
+    const trimmedBody = commentBody.trim();
+    const trimmedName = commentName.trim();
+
+    if (!trimmedBody) {
+      setCommentError("Comment cannot be empty.");
+      return;
+    }
+
+    setSubmitting(true);
+    setCommentError(null);
+
+    const { error } = await supabase.from("comments").insert({
+      update_id: update.id,
+      name: trimmedName || null,
+      body: trimmedBody,
+    });
+
+    if (error) {
+      console.error("Failed to submit comment:", error);
+      setCommentError("Failed to submit comment. Please try again.");
+      setSubmitting(false);
+      return;
+    }
+
+    // Clear form and refresh comments
+    setCommentBody("");
+    setLastSubmitTime(now);
+
+    const { data: refreshed, error: refreshError } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("update_id", update.id)
+      .order("created_at", { ascending: true });
+
+    if (refreshError) {
+      console.error("Failed to refresh comments:", refreshError);
+    } else if (refreshed) {
+      setComments(refreshed as Comment[]);
+    }
+
+    setSubmitting(false);
+  };
 
   return (
     <div className="update-page">
@@ -152,6 +253,72 @@ export default function UpdatePage() {
           <div className="update-source">
             <h2>Source</h2>
             <blockquote>{update.sourceExcerpt}</blockquote>
+          </div>
+
+          <div className="update-comments" id="comments">
+            <h2>Comments</h2>
+            {!supabase && (
+              <p className="discussion-note">
+                Comments are currently disabled. Supabase configuration is missing.
+              </p>
+            )}
+            {supabase && (
+              <>
+                {commentError && (
+                  <p className="discussion-error" style={{ color: "var(--accent)" }}>
+                    {commentError}
+                  </p>
+                )}
+                {commentsLoading ? (
+                  <p className="discussion-note">Loading comments...</p>
+                ) : comments.length === 0 ? (
+                  <p className="discussion-note">No comments yet. Be the first to comment.</p>
+                ) : (
+                  <ul className="comment-list">
+                    {comments.map((comment) => (
+                      <li key={comment.id} className="comment-item">
+                        <div className="comment-header">
+                          <span className="comment-author">
+                            {comment.name?.trim() || "Anonymous"}
+                          </span>
+                        </div>
+                        <p className="comment-body">{comment.body}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <form className="comment-form" onSubmit={handleSubmitComment}>
+                  <div className="form-row">
+                    <label htmlFor="comment-name">Name (optional)</label>
+                    <input
+                      id="comment-name"
+                      type="text"
+                      value={commentName}
+                      onChange={(e) => setCommentName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="comment-body">Comment</label>
+                    <textarea
+                      id="comment-body"
+                      value={commentBody}
+                      onChange={(e) => setCommentBody(e.target.value)}
+                      placeholder="Share context, questions, or clarifications for CS agents..."
+                      rows={4}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={submitting}
+                  >
+                    {submitting ? "Posting..." : "Post comment"}
+                  </button>
+                </form>
+              </>
+            )}
           </div>
 
           <div className="update-discussion">
