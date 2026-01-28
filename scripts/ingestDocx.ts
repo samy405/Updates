@@ -1172,7 +1172,187 @@ async function ingestDocx(): Promise<void> {
   const rawText = result.value;
   console.log(`✓ Extracted ${rawText.length} characters from document`);
 
-  console.log("Loading existing updates...");
+  // NEW PIPELINE: pre-categorized DOCX is the single source of truth.
+  // We will rebuild the dataset from scratch using:
+  // - Date headings for top-level batch dates
+  // - Section headers (e.g. BILLING UPDATES) for categories
+  // - "End of update" as the only per-update delimiter
+  console.log("Using pre-categorized DOCX structure; rebuilding dataset from scratch.");
+
+  // Helper to map section headers to categories
+  const getCategoryFromHeader = (line: string): UpdateCategory | null => {
+    const normalized = line.trim().toUpperCase();
+
+    if (/^BILLING(?:\s+UPDATES?)?:?$/.test(normalized)) return "Billing";
+    if (/^PHARMACY(?:\s+UPDATES?)?:?$/.test(normalized)) return "Pharmacy";
+    if (/^LABS?(?:\s+UPDATES?)?:?$/.test(normalized)) return "Labs";
+    if (/^OPERATIONS?(?:\s+UPDATES?)?:?$/.test(normalized)) return "Operations";
+    if (/^INTERNAL\s+TOOLS(?:\s*\/\s*SYSTEMS|\s*&\s*SYSTEMS)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+      return "Internal Tools / Systems";
+    }
+    if (/^CONTRACTOR(?:\s*\/\s*STAFFING|\s*&\s*STAFFING)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+      return "Contractor / Staffing";
+    }
+    if (/^COMPLIANCE(?:\s*\/\s*CLINICAL|\s*&\s*CLINICAL)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+      return "Compliance / Clinical";
+    }
+
+    return null;
+  };
+
+  const lines = rawText.split(/\n/);
+  const newUpdates: Update[] = [];
+
+  let currentDate: Date | null = null;
+  let currentCategory: UpdateCategory = "Miscellaneous";
+  let currentBlockLines: string[] = [];
+
+  const flushCurrentBlock = () => {
+    const rawBody = currentBlockLines.join("\n").trim();
+    if (!rawBody || !currentDate) {
+      currentBlockLines = [];
+      return;
+    }
+
+    // Normalize but do not paraphrase
+    let body = rawBody;
+    body = preserveStructure(body);
+    body = cleanSlackText(body);
+
+    const dateStr = currentDate.toISOString().split("T")[0];
+
+    const title = extractTitle(body, currentCategory);
+    const sourceExcerpt = body.length > 300 ? body.substring(0, 300) + "..." : body;
+
+    const id = generateId(title, dateStr);
+
+    const update: Update = {
+      id,
+      datePosted: dateStr,
+      author: "", // Author no longer shown in UI
+      category: currentCategory,
+      title,
+      body,
+      sourceExcerpt,
+      supersedesIds: [],
+      supersededById: null,
+      status: "active",
+      needsAnswer: false,
+    };
+
+    newUpdates.push(update);
+    currentBlockLines = [];
+  };
+
+  console.log("Parsing lines, applying date headings, section headers, and 'End of update' delimiters...");
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Date headings (top-level batch dates)
+    const maybeDate = parseDateHeading(trimmed);
+    if (maybeDate) {
+      currentDate = maybeDate;
+      continue;
+    }
+
+    // Section category headers (source of truth for category)
+    const maybeCategory = getCategoryFromHeader(trimmed);
+    if (maybeCategory) {
+      currentCategory = maybeCategory;
+      continue;
+    }
+
+    // End of update delimiter (case-insensitive, exact phrase)
+    if (/^end\s+of\s+update\s*$/i.test(trimmed)) {
+      flushCurrentBlock();
+      continue;
+    }
+
+    // Regular content line - keep verbatim
+    currentBlockLines.push(line);
+  }
+
+  // Flush any trailing block (in case document is missing final delimiter)
+  flushCurrentBlock();
+
+  // VALIDATION REPORT
+  console.log("=== Ingestion Validation Report ===");
+  console.log(`Total updates generated: ${newUpdates.length}`);
+
+  const categoryCounts: Record<UpdateCategory, number> = {
+    Pharmacy: 0,
+    Billing: 0,
+    Labs: 0,
+    Operations: 0,
+    "Internal Tools / Systems": 0,
+    "Contractor / Staffing": 0,
+    "Compliance / Clinical": 0,
+    Miscellaneous: 0,
+  };
+
+  for (const update of newUpdates) {
+    categoryCounts[update.category]++;
+  }
+
+  console.log("Updates per category:");
+  (Object.keys(categoryCounts) as UpdateCategory[]).forEach((cat) => {
+    console.log(`  - ${cat}: ${categoryCounts[cat]}`);
+  });
+
+  console.log("Updates detail:");
+  newUpdates.forEach((u, index) => {
+    const preview = u.body.replace(/\s+/g, " ").slice(0, 80);
+    console.log(
+      `  [${index + 1}] (${u.category}) "${u.title}" :: ${preview}${u.body.length > 80 ? "…" : ""}`
+    );
+  });
+
+  // Basic sanity checks
+  if (newUpdates.length === 0) {
+    console.warn(
+      "WARNING: No updates were generated. This usually indicates a parsing mismatch with the DOCX structure. " +
+        "Please review the ingestion logs (dates, section headers, and 'End of update' delimiters) and the source document."
+    );
+  }
+
+  const primaryCategories: UpdateCategory[] = ["Billing", "Pharmacy", "Labs", "Operations"];
+  const primaryZero = primaryCategories.filter((c) => categoryCounts[c] === 0);
+  if (primaryZero.length > 0) {
+    console.warn(
+      `WARNING: No updates detected for primary categories: ${primaryZero.join(
+        ", "
+      )}. This may be expected if the current DOCX does not include those sections.`
+    );
+  }
+
+  // Sort and write out dataset (full rebuild)
+  newUpdates.sort((a, b) => {
+    if (a.datePosted !== b.datePosted) {
+      return b.datePosted.localeCompare(a.datePosted);
+    }
+    return a.title.localeCompare(b.title);
+  });
+
+  const lastIngestedDate = newUpdates.length > 0 ? newUpdates[0].datePosted : null;
+
+  const outputData: UpdatesData = {
+    updates: newUpdates,
+    lastIngestedDate,
+  };
+
+  console.log(
+    `Writing ${outputData.updates.length} updates to ${DATA_FILE} and ${DATA_FILE_SOURCE} (full replacement)...`
+  );
+  fs.writeFileSync(DATA_FILE, JSON.stringify(outputData, null, 2), "utf-8");
+  fs.writeFileSync(DATA_FILE_SOURCE, JSON.stringify(outputData, null, 2), "utf-8");
+
+  console.log("Ingestion complete (new pipeline).");
+
+  // === LEGACY PIPELINE (kept for reference/debug only) ===
+  // NOTE: Uses separate variable names to avoid collisions with the new pipeline.
+  console.log("Loading existing updates (legacy pipeline, not used for main output)...");
   let existingData: UpdatesData;
   const sourceFile = fs.existsSync(DATA_FILE_SOURCE) ? DATA_FILE_SOURCE : DATA_FILE;
   if (fs.existsSync(sourceFile)) {
@@ -1185,11 +1365,11 @@ async function ingestDocx(): Promise<void> {
   const existingUpdates = existingData.updates;
 
   // STEP 1: Extract date headings and their positions
-  const lines = rawText.split(/\n/);
+  const legacyLines = rawText.split(/\n/);
   const dateHeadings: { date: Date; lineIndex: number }[] = [];
   
-  for (let i = 0; i < lines.length; i++) {
-    const date = parseDateHeading(lines[i].trim());
+  for (let i = 0; i < legacyLines.length; i++) {
+    const date = parseDateHeading(legacyLines[i].trim());
     if (date) {
       dateHeadings.push({ date, lineIndex: i });
     }
@@ -1229,7 +1409,7 @@ async function ingestDocx(): Promise<void> {
   
   console.log(`Processing ${updateBlocks.length} update blocks`);
 
-  const newUpdates: Update[] = [];
+  const legacyNewUpdates: Update[] = [];
   let lastProcessedDate: Date | null = null;
 
   // STEP 3: Process each update block
@@ -1361,7 +1541,7 @@ async function ingestDocx(): Promise<void> {
             needsAnswer: false,
           };
           
-          newUpdates.push(update);
+          legacyNewUpdates.push(update);
           
           // Debug output: show scores
           const top2Scores = classification.scores.slice(0, 2);
@@ -1407,7 +1587,7 @@ async function ingestDocx(): Promise<void> {
         needsAnswer: false,
       };
 
-      newUpdates.push(update);
+      legacyNewUpdates.push(update);
       
       // Debug output: show scores
       const top2Scores = classification.scores.slice(0, 2);
@@ -1422,20 +1602,20 @@ async function ingestDocx(): Promise<void> {
 
   // For full re-ingestion, replace all existing updates
   // Otherwise, merge new with existing
-  const shouldReplaceAll = process.env.REINGEST_ALL === "true" || newUpdates.length > 0;
+  const shouldReplaceAll = process.env.REINGEST_ALL === "true" || legacyNewUpdates.length > 0;
   
   let allUpdates: Update[];
-  if (shouldReplaceAll && newUpdates.length > 0) {
+  if (shouldReplaceAll && legacyNewUpdates.length > 0) {
     // Replace all updates from dates we're processing
-    const processedDates = new Set(newUpdates.map(u => u.datePosted));
+    const processedDates = new Set(legacyNewUpdates.map(u => u.datePosted));
     const keptUpdates = existingUpdates.filter(u => !processedDates.has(u.datePosted));
-    allUpdates = [...keptUpdates, ...newUpdates];
-    console.log(`Replaced updates for ${processedDates.size} date(s), kept ${keptUpdates.length} existing updates`);
+    allUpdates = [...keptUpdates, ...legacyNewUpdates];
+    console.log(`(legacy) Replaced updates for ${processedDates.size} date(s), kept ${keptUpdates.length} existing updates`);
   } else {
     // Merge new with existing, deduplicate
     const seenTitles = new Set<string>();
     const deduplicatedNew: Update[] = [];
-    for (const update of newUpdates) {
+    for (const update of legacyNewUpdates) {
       const titleKey = `${update.datePosted}-${update.title.toLowerCase().trim()}`;
       if (!seenTitles.has(titleKey)) {
         seenTitles.add(titleKey);
@@ -1464,17 +1644,17 @@ async function ingestDocx(): Promise<void> {
     fs.mkdirSync(publicDataDir, { recursive: true });
   }
 
-  console.log(`\n=== Ingestion Summary ===`);
+  console.log(`\n=== Legacy Ingestion Summary ===`);
   console.log(`Total updates in database: ${allUpdates.length}`);
-  console.log(`New updates added: ${newUpdates.length}`);
+  console.log(`New updates added (legacy): ${legacyNewUpdates.length}`);
   
   // Category breakdown
-  const categoryCounts: Record<string, number> = {};
+  const legacyCategoryCounts: Record<string, number> = {};
   for (const update of allUpdates) {
-    categoryCounts[update.category] = (categoryCounts[update.category] || 0) + 1;
+    legacyCategoryCounts[update.category] = (legacyCategoryCounts[update.category] || 0) + 1;
   }
-  console.log(`\nCategory breakdown:`);
-  for (const [category, count] of Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])) {
+  console.log(`\nCategory breakdown (legacy):`);
+  for (const [category, count] of Object.entries(legacyCategoryCounts).sort((a, b) => b[1] - a[1])) {
     console.log(`  ${category}: ${count}`);
   }
   
