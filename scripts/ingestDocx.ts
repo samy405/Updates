@@ -1189,20 +1189,28 @@ async function ingestDocx(): Promise<void> {
   console.log("Using pre-categorized DOCX structure; rebuilding dataset from scratch.");
 
   // Helper to map section headers to categories
+  // Handles formatting variations: extra spaces, emojis, punctuation, capitalization
   const getCategoryFromHeader = (line: string): UpdateCategory | null => {
-    const normalized = line.trim().toUpperCase();
+    // Remove emojis and special characters, normalize spaces, convert to uppercase
+    let normalized = line
+      .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // Remove emojis
+      .replace(/[^\w\s\/&]/g, "") // Remove punctuation except / and &
+      .replace(/\s+/g, " ") // Normalize spaces
+      .trim()
+      .toUpperCase();
 
-    if (/^BILLING(?:\s+UPDATES?)?:?$/.test(normalized)) return "Billing";
-    if (/^PHARMACY(?:\s+UPDATES?)?:?$/.test(normalized)) return "Pharmacy";
-    if (/^LABS?(?:\s+UPDATES?)?:?$/.test(normalized)) return "Labs";
-    if (/^OPERATIONS?(?:\s+UPDATES?)?:?$/.test(normalized)) return "Operations";
-    if (/^INTERNAL\s+TOOLS(?:\s*\/\s*SYSTEMS|\s*&\s*SYSTEMS)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+    // Match category headers with flexible patterns
+    if (/^BILLING(\s+UPDATES?)?$/.test(normalized)) return "Billing";
+    if (/^PHARMACY(\s+UPDATES?)?$/.test(normalized)) return "Pharmacy";
+    if (/^LABS?(\s+UPDATES?)?$/.test(normalized)) return "Labs";
+    if (/^OPERATIONS?(\s+UPDATES?)?$/.test(normalized)) return "Operations";
+    if (/^INTERNAL\s+TOOLS(\s*\/\s*SYSTEMS|\s*&\s*SYSTEMS)?(\s+UPDATES?)?$/.test(normalized)) {
       return "Internal Tools / Systems";
     }
-    if (/^CONTRACTOR(?:\s*\/\s*STAFFING|\s*&\s*STAFFING)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+    if (/^CONTRACTOR(\s*\/\s*STAFFING|\s*&\s*STAFFING)?(\s+UPDATES?)?$/.test(normalized)) {
       return "Contractor / Staffing";
     }
-    if (/^COMPLIANCE(?:\s*\/\s*CLINICAL|\s*&\s*CLINICAL)?(?:\s+UPDATES?)?:?$/.test(normalized)) {
+    if (/^COMPLIANCE(\s*\/\s*CLINICAL|\s*&\s*CLINICAL)?(\s+UPDATES?)?$/.test(normalized)) {
       return "Compliance / Clinical";
     }
 
@@ -1213,7 +1221,7 @@ async function ingestDocx(): Promise<void> {
   const newUpdates: Update[] = [];
 
   let currentDate: Date | null = null;
-  let currentCategory: UpdateCategory = "Miscellaneous";
+  let currentCategory: UpdateCategory | null = null; // Start as null, only set when header found
   let currentBlockLines: string[] = [];
   let usedFallbackDate = false;
 
@@ -1244,7 +1252,10 @@ async function ingestDocx(): Promise<void> {
 
     const dateStr = effectiveDate.toISOString().split("T")[0];
 
-    const title = extractTitle(body, currentCategory);
+    // Use currentCategory if set, otherwise default to Miscellaneous only if truly before any header
+    const effectiveCategory: UpdateCategory = currentCategory || "Miscellaneous";
+
+    const title = extractTitle(body, effectiveCategory);
     const sourceExcerpt = body.length > 300 ? body.substring(0, 300) + "..." : body;
 
     const id = generateId(title, dateStr);
@@ -1253,7 +1264,7 @@ async function ingestDocx(): Promise<void> {
       id,
       datePosted: dateStr,
       author: "", // Author no longer shown in UI
-      category: currentCategory,
+      category: effectiveCategory,
       title,
       body,
       sourceExcerpt,
@@ -1284,6 +1295,7 @@ async function ingestDocx(): Promise<void> {
     const maybeCategory = getCategoryFromHeader(trimmed);
     if (maybeCategory) {
       currentCategory = maybeCategory;
+      console.log(`  → Category set to: ${currentCategory}`);
       continue;
     }
 
