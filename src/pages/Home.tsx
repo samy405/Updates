@@ -94,6 +94,18 @@ export default function Home() {
     });
   };
 
+  // This is the exact list we ultimately render (flattened across date groups)
+  const renderedList = filteredUpdates;
+
+  // Temporary debug logging for category filtering behavior
+  console.log("[filter]", {
+    selectedCategory,
+    allLen: allUpdates.length,
+    filteredLen: filteredUpdates.length,
+    renderedLen: renderedList.length,
+    renderedCats: renderedList.slice(0, 5).map((u) => u.category),
+  });
+
   return (
     <div className="home">
       <div className="category-tabs">
