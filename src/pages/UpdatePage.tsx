@@ -288,45 +288,40 @@ export default function UpdatePage() {
                   </ul>
                 )}
 
-                <form className="comment-form" onSubmit={handleSubmitComment}>
-                  <div className="form-row">
-                    <label htmlFor="comment-name">Name (optional)</label>
-                    <input
-                      id="comment-name"
-                      type="text"
-                      value={commentName}
-                      onChange={(e) => setCommentName(e.target.value)}
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div className="form-row">
-                    <label htmlFor="comment-body">Comment</label>
-                    <textarea
-                      id="comment-body"
-                      value={commentBody}
-                      onChange={(e) => setCommentBody(e.target.value)}
-                      placeholder="Share context, questions, or clarifications for CS agents..."
-                      rows={4}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={submitting}
-                  >
-                    {submitting ? "Posting..." : "Post comment"}
-                  </button>
-                </form>
+                <div className="comment-form-wrapper">
+                  <h3 className="comment-form-title">Add a comment</h3>
+                  <form className="comment-form" onSubmit={handleSubmitComment}>
+                    <div className="form-row">
+                      <label htmlFor="comment-name">Name (optional)</label>
+                      <input
+                        id="comment-name"
+                        type="text"
+                        value={commentName}
+                        onChange={(e) => setCommentName(e.target.value)}
+                        placeholder="Your name"
+                      />
+                    </div>
+                    <div className="form-row">
+                      <label htmlFor="comment-body">Comment</label>
+                      <textarea
+                        id="comment-body"
+                        value={commentBody}
+                        onChange={(e) => setCommentBody(e.target.value)}
+                        placeholder="Share context, questions, or clarifications for CS agents..."
+                        rows={4}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={submitting}
+                    >
+                      {submitting ? "Posting..." : "Post comment"}
+                    </button>
+                  </form>
+                </div>
               </>
             )}
-          </div>
-
-          <div className="update-discussion">
-            <h2>Discussion</h2>
-            <p className="discussion-note">
-              Questions or comments about this update? Use the discussion thread below.
-            </p>
-            <div id="giscus-container"></div>
           </div>
         </article>
       </div>
