@@ -64,6 +64,13 @@
   object-position: center;
 }
 
+/* Light mode: logo 2x smaller */
+:root:not([data-theme="dark"]) .fountain-logo {
+  height: 48.75px;
+  max-height: 48.75px;
+  max-width: 110px;
+}
+
 .header-title {
   font-size: 1rem;
   font-weight: 400;
@@ -161,6 +168,12 @@
     height: 35px;
     max-height: 35px;
     max-width: 100px;
+  }
+
+  :root:not([data-theme="dark"]) .fountain-logo {
+    height: 17.5px;
+    max-height: 17.5px;
+    max-width: 50px;
   }
 
   .header-title {
