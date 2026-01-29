@@ -5,12 +5,24 @@
 .welcome-message {
   margin-bottom: 3rem;
   padding: 2rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   position: relative;
   overflow: hidden;
+}
+
+:root[data-theme="dark"] .welcome-message {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .welcome-message::before {
@@ -77,90 +89,85 @@
 
 .category-tab {
   padding: 0.5rem 1.125rem;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
   color: var(--muted);
   border-radius: 999px;
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 500;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   letter-spacing: 0.01em;
   position: relative;
   overflow: hidden;
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.05) 50%, transparent 100%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(13, 148, 136, 0.02) 10px,
-      rgba(13, 148, 136, 0.02) 20px
-    );
-  background-size: 200% 200%, 40px 40px;
-  animation: techPattern 8s linear infinite;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 :root[data-theme="dark"] .category-tab {
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.08) 50%, transparent 100%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(20, 184, 166, 0.04) 10px,
-      rgba(20, 184, 166, 0.04) 20px
-    );
-}
-
-@keyframes techPattern {
-  0% {
-    background-position: 0% 0%, 0 0;
-  }
-  100% {
-    background-position: 100% 100%, 40px 40px;
-  }
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .category-tab:hover {
-  border-color: var(--accent);
+  border-color: rgba(13, 148, 136, 0.3);
   color: var(--accent);
-  background: var(--accent-light);
+  background: rgba(230, 255, 250, 0.6);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   transform: translateY(-1px);
+  box-shadow: 
+    0 4px 16px rgba(13, 148, 136, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="dark"] .category-tab:hover {
+  background: rgba(15, 118, 110, 0.3);
+  border-color: rgba(20, 184, 166, 0.3);
+  box-shadow: 
+    0 4px 16px rgba(20, 184, 166, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .category-tab.active {
-  background: var(--accent);
+  background: rgba(13, 148, 136, 0.9);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   color: white;
-  border-color: var(--accent);
-  box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
-  background-image: 
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(255, 255, 255, 0.05) 8px,
-      rgba(255, 255, 255, 0.05) 16px
-    );
-  background-size: 200% 200%, 32px 32px;
-  animation: activeShimmer 3s ease-in-out infinite, techPattern 6s linear infinite;
+  border-color: rgba(13, 148, 136, 0.5);
+  box-shadow: 
+    0 4px 16px rgba(13, 148, 136, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-@keyframes activeShimmer {
-  0%, 100% {
-    background-position: 0% 0%, 0 0;
-  }
-  50% {
-    background-position: 100% 100%, 16px 16px;
-  }
+:root[data-theme="dark"] .category-tab.active {
+  background: rgba(20, 184, 166, 0.8);
+  border-color: rgba(20, 184, 166, 0.5);
+  box-shadow: 
+    0 4px 16px rgba(20, 184, 166, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .category-tab.active:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
-  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+  background: rgba(15, 118, 110, 0.95);
+  border-color: rgba(15, 118, 110, 0.6);
+  box-shadow: 
+    0 6px 20px rgba(13, 148, 136, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+:root[data-theme="dark"] .category-tab.active:hover {
+  background: rgba(13, 148, 136, 0.9);
+  box-shadow: 
+    0 6px 20px rgba(20, 184, 166, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .updates-header {
@@ -183,63 +190,53 @@
 }
 
 .date-group {
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   overflow: hidden;
-  background: var(--surface);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.02) 50%, transparent 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      rgba(13, 148, 136, 0.01) 1px,
-      rgba(13, 148, 136, 0.01) 2px
-    );
-  background-size: 200% 200%, 20px 20px;
-  animation: subtleMetallic 15s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] .date-group {
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.04) 50%, transparent 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      rgba(20, 184, 166, 0.02) 1px,
-      rgba(20, 184, 166, 0.02) 2px
-    );
-}
-
-@keyframes subtleMetallic {
-  0%, 100% {
-    background-position: 0% 0%, 0 0;
-  }
-  50% {
-    background-position: 100% 100%, 10px 10px;
-  }
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .date-group:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border-color: var(--border);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+:root[data-theme="dark"] .date-group:hover {
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .date-header {
   width: 100%;
   padding: 1.5rem 2rem;
-  background: var(--bg);
+  background: transparent;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
   text-align: left;
-  transition: background 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1rem;
   font-family: inherit;
   position: relative;
@@ -276,7 +273,11 @@
 }
 
 .date-header:hover {
-  background: var(--accent-light);
+  background: rgba(230, 255, 250, 0.3);
+}
+
+:root[data-theme="dark"] .date-header:hover {
+  background: rgba(20, 184, 166, 0.1);
 }
 
 .date-title {
@@ -313,7 +314,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: var(--surface);
+  background: transparent;
 }
 
 .empty-state {

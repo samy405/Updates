@@ -28,45 +28,25 @@
 }
 
 .update-content {
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: 16px;
   padding: 3.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  border: 1px solid var(--border);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
   overflow: hidden;
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.02) 50%, transparent 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(13, 148, 136, 0.01) 2px,
-      rgba(13, 148, 136, 0.01) 4px
-    );
-  background-size: 200% 200%, 30px 30px;
-  animation: pageMetallic 18s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] .update-content {
-  background-image: 
-    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.04) 50%, transparent 100%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(20, 184, 166, 0.02) 2px,
-      rgba(20, 184, 166, 0.02) 4px
-    );
-}
-
-@keyframes pageMetallic {
-  0%, 100% {
-    background-position: 0% 0%, 0 0;
-  }
-  50% {
-    background-position: 100% 100%, 15px 15px;
-  }
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .update-header {
@@ -237,8 +217,21 @@
 .comment-item {
   padding: 0.9rem 1.1rem;
   border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+:root[data-theme="dark"] .comment-item {
+  background: rgba(30, 41, 59, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .comment-header {
@@ -262,12 +255,43 @@
   width: 100%;
   padding: 0.6rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
   color: var(--text);
   font-family: inherit;
   font-size: 0.95rem;
   margin-top: 0.35rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.comment-edit-textarea:focus {
+  outline: none;
+  border-color: rgba(13, 148, 136, 0.4);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    0 4px 12px rgba(13, 148, 136, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="dark"] .comment-edit-textarea {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .comment-edit-textarea:focus {
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: 
+    0 4px 12px rgba(20, 184, 166, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .comment-actions {
@@ -333,11 +357,45 @@
   width: 100%;
   padding: 0.6rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
   color: var(--text);
   font-family: inherit;
   font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.form-row input:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: rgba(13, 148, 136, 0.4);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    0 4px 12px rgba(13, 148, 136, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="dark"] .form-row input,
+:root[data-theme="dark"] .form-row textarea {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .form-row input:focus,
+:root[data-theme="dark"] .form-row textarea:focus {
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgba(30, 41, 59, 0.6);
+  box-shadow: 
+    0 4px 12px rgba(20, 184, 166, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .comment-form .btn {
