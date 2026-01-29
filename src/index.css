@@ -51,6 +51,178 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  background-color: var(--bg);
+}
+
+/* Dedicated background layer with architectural elements */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: 
+    linear-gradient(135deg, transparent 0%, transparent 15%, rgba(13, 148, 136, 0.05) 35%, rgba(13, 148, 136, 0.08) 50%, rgba(13, 148, 136, 0.05) 65%, transparent 85%, transparent 100%),
+    linear-gradient(0deg, transparent 0%, transparent 40%, rgba(13, 148, 136, 0.04) 48%, rgba(13, 148, 136, 0.06) 50%, rgba(13, 148, 136, 0.04) 52%, transparent 60%, transparent 100%);
+  background-size: 500% 500%, 100% 800px;
+  background-position: 0% 0%, 0 0;
+  animation: backgroundDrift1 110s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] body::before {
+  background: 
+    linear-gradient(135deg, transparent 0%, transparent 15%, rgba(20, 184, 166, 0.06) 35%, rgba(20, 184, 166, 0.09) 50%, rgba(20, 184, 166, 0.06) 65%, transparent 85%, transparent 100%),
+    linear-gradient(0deg, transparent 0%, transparent 40%, rgba(20, 184, 166, 0.05) 48%, rgba(20, 184, 166, 0.07) 50%, rgba(20, 184, 166, 0.05) 52%, transparent 60%, transparent 100%);
+}
+
+@keyframes backgroundDrift1 {
+  0%, 100% {
+    background-position: 0% 0%, 0 0;
+  }
+  50% {
+    background-position: 250% 250%, 0 400px;
+  }
+}
+
+/* Additional background layer via #root */
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+#root::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background: 
+    /* Metallic ribbon - vertical */
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 45%,
+      rgba(13, 148, 136, 0.05) 49%,
+      rgba(13, 148, 136, 0.07) 50%,
+      rgba(13, 148, 136, 0.05) 51%,
+      transparent 55%,
+      transparent 100%
+    ),
+    /* Large geometric plane - angled */
+    linear-gradient(
+      45deg,
+      transparent 0%,
+      transparent 25%,
+      rgba(13, 148, 136, 0.04) 40%,
+      rgba(13, 148, 136, 0.06) 50%,
+      rgba(13, 148, 136, 0.04) 60%,
+      transparent 75%,
+    );
+  background-size: 1000px 100%, 600% 600%;
+  background-position: 0 0, 0% 0%;
+  animation: backgroundDrift2 120s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] #root::before {
+  background: 
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 45%,
+      rgba(20, 184, 166, 0.06) 49%,
+      rgba(20, 184, 166, 0.08) 50%,
+      rgba(20, 184, 166, 0.06) 51%,
+      transparent 55%,
+      transparent 100%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 0%,
+      transparent 25%,
+      rgba(20, 184, 166, 0.05) 40%,
+      rgba(20, 184, 166, 0.07) 50%,
+      rgba(20, 184, 166, 0.05) 60%,
+      transparent 75%,
+    );
+}
+
+@keyframes backgroundDrift2 {
+  0%, 100% {
+    background-position: 0 0, 0% 0%;
+  }
+  50% {
+    background-position: 500px 0, 300% 300%;
+  }
+}
+
+/* Additional layer for more depth */
+#root::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background: 
+    /* Thin translucent panel - horizontal */
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 15%,
+      rgba(13, 148, 136, 0.04) 30%,
+      rgba(13, 148, 136, 0.06) 40%,
+      rgba(13, 148, 136, 0.04) 50%,
+      transparent 65%,
+      transparent 100%
+    ),
+    /* Soft geometric shape */
+    radial-gradient(
+      ellipse 800px 400px at 50% 50%,
+      rgba(13, 148, 136, 0.04) 0%,
+      rgba(13, 148, 136, 0.03) 25%,
+      transparent 55%
+    );
+  background-size: 100% 1200px, 100% 100%;
+  background-position: 0 0, 0 0;
+  animation: backgroundDrift3 150s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] #root::after {
+  background: 
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 15%,
+      rgba(20, 184, 166, 0.05) 30%,
+      rgba(20, 184, 166, 0.07) 40%,
+      rgba(20, 184, 166, 0.05) 50%,
+      transparent 65%,
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 800px 400px at 50% 50%,
+      rgba(20, 184, 166, 0.05) 0%,
+      rgba(20, 184, 166, 0.04) 25%,
+      transparent 55%
+    );
+}
+
+@keyframes backgroundDrift3 {
+  0%, 100% {
+    background-position: 0 0, 0 0;
+  }
+  50% {
+    background-position: 0 600px, 0 0;
+  }
 }
 
 a {
