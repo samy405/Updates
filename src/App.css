@@ -130,6 +130,57 @@
   z-index: 1;
 }
 
+/* Additional medium glass panel - Layer 6 */
+.main-content::after {
+  content: "";
+  position: fixed;
+  bottom: 20%;
+  right: 8%;
+  width: 28%;
+  height: 32%;
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(20deg);
+  background: linear-gradient(45deg, 
+    rgba(13, 148, 136, 0.07) 0%,
+    rgba(13, 148, 136, 0.11) 50%,
+    rgba(13, 148, 136, 0.07) 100%
+  );
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.14);
+  border-radius: 2px;
+  box-shadow: 
+    0 0 55px rgba(13, 148, 136, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.09);
+  animation: glassPanel3 104s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .main-content::after {
+  background: linear-gradient(45deg, 
+    rgba(20, 184, 166, 0.09) 0%,
+    rgba(20, 184, 166, 0.14) 50%,
+    rgba(20, 184, 166, 0.09) 100%
+  );
+  border: 1px solid rgba(20, 184, 166, 0.19);
+  box-shadow: 
+    0 0 75px rgba(20, 184, 166, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.19);
+}
+
+@keyframes glassPanel3 {
+  0%, 100% {
+    transform: rotate(20deg) translate(0, 0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: rotate(23deg) translate(-8%, 6%);
+    opacity: 0.75;
+  }
+}
+
 /* Layer 5: Circuit connection nodes */
 .main-content::before {
   content: "";
@@ -150,7 +201,7 @@
     0 0 20px rgba(13, 148, 136, 0.5),
     0 0 40px rgba(13, 148, 136, 0.3),
     inset 0 0 4px rgba(255, 255, 255, 0.4);
-  animation: nodePulse 3s ease-in-out infinite;
+  animation: nodePulse 2.4s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] .main-content::before {
@@ -196,7 +247,7 @@
     0 0 15px rgba(13, 148, 136, 0.4),
     0 0 30px rgba(13, 148, 136, 0.25),
     inset 0 0 3px rgba(255, 255, 255, 0.35);
-  animation: nodePulse2 4s ease-in-out infinite;
+  animation: nodePulse2 3.2s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] .main-content::after {
@@ -240,3 +291,4 @@
     padding: 1.5rem 1rem;
   }
 }
+

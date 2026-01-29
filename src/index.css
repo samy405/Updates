@@ -86,17 +86,17 @@ body {
   z-index: 1;
 }
 
-/* Layer 2: Large diagonal glass panel - data visualization surface */
+/* Layer 2: Multiple medium-sized glass panels */
 #root::before {
   content: "";
   position: fixed;
-  top: -20%;
-  left: -10%;
-  width: 60%;
-  height: 140%;
+  top: 15%;
+  left: 5%;
+  width: 25%;
+  height: 40%;
   z-index: 0;
   pointer-events: none;
-  transform: rotate(15deg);
+  transform: rotate(12deg);
   background: linear-gradient(135deg, 
     rgba(13, 148, 136, 0.08) 0%,
     rgba(13, 148, 136, 0.12) 50%,
@@ -110,7 +110,7 @@ body {
     0 0 60px rgba(13, 148, 136, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  animation: glassPanel1 120s ease-in-out infinite;
+  animation: glassPanel1 96s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] #root::before {
@@ -128,11 +128,11 @@ body {
 
 @keyframes glassPanel1 {
   0%, 100% {
-    transform: rotate(15deg) translate(0, 0);
+    transform: rotate(12deg) translate(0, 0);
     opacity: 0.6;
   }
   50% {
-    transform: rotate(18deg) translate(15%, 10%);
+    transform: rotate(15deg) translate(12%, 8%);
     opacity: 0.8;
   }
 }
@@ -158,7 +158,9 @@ body {
     0 0 20px rgba(13, 148, 136, 0.3),
     0 0 40px rgba(13, 148, 136, 0.2),
     inset 0 0 10px rgba(255, 255, 255, 0.3);
-  animation: dataFlow 8s ease-in-out infinite;
+  background-size: 100% 200%;
+  background-position: 0 0;
+  animation: dataFlow 6.4s ease-in-out infinite, dataStream 9.6s linear infinite;
 }
 
 :root[data-theme="dark"] #root::after {
@@ -170,10 +172,21 @@ body {
     transparent 100%
   );
   background-size: 100% 200%;
+  background-position: 0 0;
+  animation: dataFlow 6.4s ease-in-out infinite, dataStream 9.6s linear infinite;
   box-shadow: 
     0 0 30px rgba(20, 184, 166, 0.4),
     0 0 60px rgba(20, 184, 166, 0.3),
     inset 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes dataStream {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
 }
 
 @keyframes dataFlow {
@@ -187,17 +200,17 @@ body {
   }
 }
 
-/* Layer 4: Horizontal data processing panel */
+/* Layer 4: Additional medium glass panel */
 body::after {
   content: "";
   position: fixed;
-  bottom: -15%;
-  left: 20%;
-  width: 50%;
-  height: 30%;
+  top: 50%;
+  left: 12%;
+  width: 22%;
+  height: 35%;
   z-index: 0;
   pointer-events: none;
-  transform: rotate(-8deg);
+  transform: rotate(-10deg);
   background: 
     linear-gradient(90deg,
       rgba(13, 148, 136, 0.06) 0%,
@@ -224,7 +237,7 @@ body::after {
     inset 0 -1px 0 rgba(0, 0, 0, 0.08);
   background-size: 100% 100%, 100% 100%;
   background-position: 0 0, 0 0;
-  animation: scanPanel 6s linear infinite, glassPanel2 140s ease-in-out infinite;
+  animation: scanPanel 4.8s linear infinite, glassPanel2 112s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] body::after {
@@ -261,11 +274,11 @@ body::after {
 
 @keyframes glassPanel2 {
   0%, 100% {
-    transform: rotate(-8deg) translate(0, 0);
+    transform: rotate(-10deg) translate(0, 0);
     opacity: 0.5;
   }
   50% {
-    transform: rotate(-10deg) translate(-10%, 5%);
+    transform: rotate(-12deg) translate(-8%, 4%);
     opacity: 0.7;
   }
 }
