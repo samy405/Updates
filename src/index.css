@@ -55,114 +55,84 @@ body {
 }
 
 /* ============================================
-   CONTINUOUS FLOWING SYSTEM - BACKGROUND
+   UNIFIED HARMONIOUS BACKGROUND SYSTEM
    ============================================ */
 
-/* Layer 1: Continuous vertical data stream - flows upward */
+/* Layer 1: Large soft gradient overlay - drifts slowly */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  right: 12%;
-  width: 2px;
-  height: 100vh;
+  top: -30%;
+  left: -20%;
+  width: 140%;
+  height: 160%;
   z-index: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    180deg,
-    transparent 0%,
-    transparent 8%,
-    rgba(13, 148, 136, 0.3) 8%,
-    rgba(13, 148, 136, 0.5) 10%,
-    rgba(13, 148, 136, 0.3) 12%,
-    transparent 12%,
-    transparent 20%
+  background: radial-gradient(
+    ellipse 1200px 800px at 30% 40%,
+    rgba(13, 148, 136, 0.08) 0%,
+    rgba(13, 148, 136, 0.04) 30%,
+    transparent 60%
   );
-  background-size: 100% 200px;
-  background-position: 0 0;
-  box-shadow: 
-    0 0 20px rgba(13, 148, 136, 0.4),
-    0 0 40px rgba(13, 148, 136, 0.25),
-    inset 0 0 10px rgba(255, 255, 255, 0.3);
-  animation: verticalStream 4s linear infinite;
+  animation: gentleDrift1 80s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] body::before {
-  background: repeating-linear-gradient(
-    180deg,
-    transparent 0%,
-    transparent 8%,
-    rgba(20, 184, 166, 0.4) 8%,
-    rgba(20, 184, 166, 0.6) 10%,
-    rgba(20, 184, 166, 0.4) 12%,
-    transparent 12%,
-    transparent 20%
+  background: radial-gradient(
+    ellipse 1200px 800px at 30% 40%,
+    rgba(20, 184, 166, 0.1) 0%,
+    rgba(20, 184, 166, 0.05) 30%,
+    transparent 60%
   );
-  box-shadow: 
-    0 0 25px rgba(20, 184, 166, 0.5),
-    0 0 50px rgba(20, 184, 166, 0.35),
-    inset 0 0 12px rgba(255, 255, 255, 0.2);
 }
 
-@keyframes verticalStream {
-  0% {
-    background-position: 0 0;
+@keyframes gentleDrift1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
   }
-  100% {
-    background-position: 0 200px;
+  50% {
+    transform: translate(8%, 5%) scale(1.05);
+    opacity: 0.8;
   }
 }
 
-/* Layer 2: Continuous horizontal data stream - flows left to right */
+/* Layer 2: Overlapping soft form - coordinated movement */
 body::after {
   content: "";
   position: fixed;
-  top: 40%;
-  left: 0;
-  width: 100vw;
-  height: 1.5px;
+  top: -25%;
+  right: -15%;
+  width: 130%;
+  height: 150%;
   z-index: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 15%,
-    rgba(13, 148, 136, 0.25) 15%,
-    rgba(13, 148, 136, 0.45) 17%,
-    rgba(13, 148, 136, 0.25) 19%,
-    transparent 19%,
-    transparent 30%
+  background: radial-gradient(
+    ellipse 1000px 700px at 70% 50%,
+    rgba(13, 148, 136, 0.06) 0%,
+    rgba(13, 148, 136, 0.03) 35%,
+    transparent 65%
   );
-  background-size: 300px 100%;
-  background-position: 0 0;
-  box-shadow: 
-    0 0 15px rgba(13, 148, 136, 0.4),
-    0 0 30px rgba(13, 148, 136, 0.25);
-  animation: horizontalStream 5s linear infinite;
+  animation: gentleDrift2 95s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] body::after {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 15%,
-    rgba(20, 184, 166, 0.3) 15%,
-    rgba(20, 184, 166, 0.5) 17%,
-    rgba(20, 184, 166, 0.3) 19%,
-    transparent 19%,
-    transparent 30%
+  background: radial-gradient(
+    ellipse 1000px 700px at 70% 50%,
+    rgba(20, 184, 166, 0.08) 0%,
+    rgba(20, 184, 166, 0.04) 35%,
+    transparent 65%
   );
-  box-shadow: 
-    0 0 20px rgba(20, 184, 166, 0.5),
-    0 0 40px rgba(20, 184, 166, 0.35);
 }
 
-@keyframes horizontalStream {
-  0% {
-    background-position: 0 0;
+@keyframes gentleDrift2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
   }
-  100% {
-    background-position: 300px 0;
+  50% {
+    transform: translate(-6%, 8%) scale(1.08);
+    opacity: 0.7;
   }
 }
 
@@ -172,116 +142,81 @@ body::after {
   z-index: 1;
 }
 
-/* Layer 3: Continuous diagonal scanning beam - sweeps across */
+/* Layer 3: Soft flowing layer - creates depth */
 #root::before {
   content: "";
   position: fixed;
-  top: -20%;
-  left: -20%;
-  width: 150%;
-  height: 150%;
+  bottom: -20%;
+  left: 10%;
+  width: 120%;
+  height: 140%;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    transparent 48%,
-    rgba(13, 148, 136, 0.15) 49%,
-    rgba(13, 148, 136, 0.25) 50%,
-    rgba(13, 148, 136, 0.15) 51%,
-    transparent 52%,
-    transparent 100%
+  background: radial-gradient(
+    ellipse 900px 600px at 50% 60%,
+    rgba(13, 148, 136, 0.05) 0%,
+    rgba(13, 148, 136, 0.02) 40%,
+    transparent 70%
   );
-  background-size: 200% 200%;
-  background-position: 0% 0%;
-  animation: diagonalScan 8s linear infinite;
+  animation: gentleDrift3 110s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] #root::before {
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    transparent 48%,
-    rgba(20, 184, 166, 0.2) 49%,
-    rgba(20, 184, 166, 0.35) 50%,
-    rgba(20, 184, 166, 0.2) 51%,
-    transparent 52%,
-    transparent 100%
+  background: radial-gradient(
+    ellipse 900px 600px at 50% 60%,
+    rgba(20, 184, 166, 0.07) 0%,
+    rgba(20, 184, 166, 0.03) 40%,
+    transparent 70%
   );
 }
 
-@keyframes diagonalScan {
-  0% {
-    background-position: -100% -100%;
+@keyframes gentleDrift3 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
   }
-  100% {
-    background-position: 100% 100%;
+  50% {
+    transform: translate(5%, -7%) scale(1.06);
+    opacity: 0.6;
   }
 }
 
-/* Layer 4: Flowing energy particles - continuous loop */
+/* Layer 4: Subtle ambient layer - unified rhythm */
 #root::after {
   content: "";
   position: fixed;
   top: 20%;
-  left: 8%;
-  width: 300px;
-  height: 2px;
+  right: -10%;
+  width: 110%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
-  transform: rotate(35deg);
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 40%,
-    rgba(13, 148, 136, 0.4) 40%,
-    rgba(13, 148, 136, 0.6) 42%,
-    rgba(13, 148, 136, 0.4) 44%,
-    transparent 44%,
-    transparent 100%
+  background: radial-gradient(
+    ellipse 800px 500px at 80% 30%,
+    rgba(13, 148, 136, 0.04) 0%,
+    rgba(13, 148, 136, 0.02) 45%,
+    transparent 75%
   );
-  background-size: 100px 100%;
-  background-position: 0 0;
-  box-shadow: 
-    0 0 12px rgba(13, 148, 136, 0.5),
-    0 0 25px rgba(13, 148, 136, 0.3);
-  animation: particleFlow 3s linear infinite, particleDrift 12s ease-in-out infinite;
+  animation: gentleDrift4 100s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] #root::after {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0%,
-    transparent 40%,
-    rgba(20, 184, 166, 0.5) 40%,
-    rgba(20, 184, 166, 0.7) 42%,
-    rgba(20, 184, 166, 0.5) 44%,
-    transparent 44%,
-    transparent 100%
+  background: radial-gradient(
+    ellipse 800px 500px at 80% 30%,
+    rgba(20, 184, 166, 0.06) 0%,
+    rgba(20, 184, 166, 0.03) 45%,
+    transparent 75%
   );
-  box-shadow: 
-    0 0 15px rgba(20, 184, 166, 0.6),
-    0 0 30px rgba(20, 184, 166, 0.4);
 }
 
-@keyframes particleFlow {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 100px 0;
-  }
-}
-
-@keyframes particleDrift {
+@keyframes gentleDrift4 {
   0%, 100% {
-    transform: rotate(35deg) translate(0, 0);
+    transform: translate(0, 0) scale(1);
+    opacity: 0.35;
   }
-  33% {
-    transform: rotate(38deg) translate(40px, -30px);
-  }
-  66% {
-    transform: rotate(32deg) translate(-20px, 25px);
+  50% {
+    transform: translate(-4%, 6%) scale(1.04);
+    opacity: 0.55;
   }
 }
 
