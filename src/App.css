@@ -34,9 +34,10 @@
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 1rem 2rem;
   height: 60px;
+  position: relative;
 }
 
 .logo-link {
@@ -44,6 +45,9 @@
   align-items: center;
   text-decoration: none;
   transition: opacity 0.2s ease;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .logo-link:hover {
@@ -83,6 +87,8 @@
   box-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  position: absolute;
+  right: 2rem;
 }
 
 :root[data-theme="dark"] .theme-toggle {

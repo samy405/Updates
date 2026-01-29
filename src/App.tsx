@@ -42,7 +42,6 @@ function App() {
               className="fountain-logo"
             />
           </Link>
-          <span className="header-title">CS Updates</span>
           <button
             className="theme-toggle"
             onClick={toggleTheme}
