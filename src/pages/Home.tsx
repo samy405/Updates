@@ -24,6 +24,8 @@ export default function Home() {
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const [allUpdates, setAllUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
     // Load updates data
@@ -35,12 +37,13 @@ export default function Home() {
         return res.json();
       })
       .then((data: UpdatesData) => {
-        console.log(`Loaded ${data.updates.length} updates from /data/updates.json`);
         setAllUpdates(data.updates);
         setLoading(false);
+        setError(null);
       })
       .catch((err) => {
         console.error("Failed to load updates:", err);
+        setError("Failed to load updates. Please refresh the page or check your connection.");
         setLoading(false);
       });
   }, []);
@@ -79,6 +82,20 @@ export default function Home() {
       setExpandedDates(new Set([updatesByDate[0][0]]));
     }
   }, [updatesByDate, expandedDates.size]);
+
+  // Handle scroll to top button visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Smooth scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const toggleDate = (date: string) => {
     const newExpanded = new Set(expandedDates);
@@ -133,20 +150,44 @@ export default function Home() {
       </div>
 
       <div className="updates-container">
-        {loading ? (
-          <div className="empty-state">
+        {error ? (
+          <div className="error-state">
+            <div className="error-icon">⚠️</div>
+            <h3>Unable to Load Updates</h3>
+            <p>{error}</p>
+            <button 
+              className="btn btn-primary" 
+              onClick={() => window.location.reload()}
+              style={{ marginTop: "1rem" }}
+            >
+              Refresh Page
+            </button>
+          </div>
+        ) : loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
             <p>Loading updates...</p>
           </div>
         ) : allUpdates.length === 0 ? (
           <div className="empty-state">
-            <p>No updates found. Please run <code>npm run ingest</code> to populate updates.</p>
-            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.5rem" }}>
-              Check the browser console for loading errors.
-            </p>
+            <div className="empty-icon">📋</div>
+            <h3>No Updates Available</h3>
+            <p>Updates haven't been loaded yet. Please run <code>npm run ingest</code> to populate updates.</p>
           </div>
         ) : updatesByDate.length === 0 ? (
           <div className="empty-state">
+            <div className="empty-icon">🔍</div>
+            <h3>No Updates Found</h3>
             <p>No updates found{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}.</p>
+            {selectedCategory !== "All" && (
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setSelectedCategory("All")}
+                style={{ marginTop: "1rem" }}
+              >
+                View All Updates
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -191,6 +232,14 @@ export default function Home() {
           </>
         )}
       </div>
+      <button 
+        className={`scroll-to-top ${showScrollTop ? "visible" : ""}`}
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+        title="Scroll to top"
+      >
+        ↑
+      </button>
     </div>
   );
 }
