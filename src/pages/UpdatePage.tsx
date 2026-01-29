@@ -305,11 +305,6 @@ export default function UpdatePage() {
             </div>
           </div>
 
-          <div className="update-source">
-            <h2>Source</h2>
-            <blockquote>{update.sourceExcerpt}</blockquote>
-          </div>
-
           <div className="update-comments" id="comments">
             <h2>Comments</h2>
             {!supabase && (
