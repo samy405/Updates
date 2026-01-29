@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
+import { setPageMeta } from "../utils/pageMeta";
 import "./Home.css";
 
 const CATEGORIES: UpdateCategory[] = [
@@ -19,13 +20,24 @@ function normalizeCategory(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+const LAST_VISIT_KEY = "updates-hub-last-visit";
+
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<UpdateCategory | "All">("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const [allUpdates, setAllUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    setPageMeta({
+      title: "Updates Hub",
+      description:
+        "Single source of truth for Customer Support updates across Fountain. Browse updates by category and date.",
+    });
+  }, []);
 
   useEffect(() => {
     // Load updates data
@@ -58,10 +70,19 @@ export default function Home() {
     );
   }, [allUpdates, selectedCategory]);
 
-  // Group updates by date (derived from filteredUpdates only)
+  const searchFilteredUpdates = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return filteredUpdates;
+    return filteredUpdates.filter(
+      (u) =>
+        u.title.toLowerCase().includes(q) || u.body.toLowerCase().includes(q)
+    );
+  }, [filteredUpdates, searchQuery]);
+
+  // Group updates by date (derived from search-filtered list)
   const updatesByDate = useMemo(() => {
     const grouped: Record<string, Update[]> = {};
-    for (const update of filteredUpdates) {
+    for (const update of searchFilteredUpdates) {
       if (!grouped[update.datePosted]) {
         grouped[update.datePosted] = [];
       }
@@ -69,12 +90,12 @@ export default function Home() {
     }
     // Sort dates descending (work on a copy of entries)
     return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filteredUpdates]);
+  }, [searchFilteredUpdates]);
 
-  // Reset expanded dates when category changes to avoid stale state
+  // Reset expanded dates when category or search changes
   useEffect(() => {
     setExpandedDates(new Set());
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
 
   // Expand first date by default (after category change resets expandedDates)
   useEffect(() => {
@@ -90,6 +111,26 @@ export default function Home() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // "New since last visit": count and persist last visit time
+  const [lastVisitTime] = useState(() => {
+    if (typeof window === "undefined") return 0;
+    return parseInt(localStorage.getItem(LAST_VISIT_KEY) ?? "0", 10);
+  });
+  const newSinceLastVisit = useMemo(() => {
+    if (lastVisitTime <= 0) return 0;
+    return allUpdates.filter(
+      (u) => new Date(u.datePosted).getTime() > lastVisitTime
+    ).length;
+  }, [allUpdates, lastVisitTime]);
+
+  useEffect(() => {
+    const saveVisit = () => {
+      localStorage.setItem(LAST_VISIT_KEY, String(Date.now()));
+    };
+    window.addEventListener("beforeunload", saveVisit);
+    return () => window.removeEventListener("beforeunload", saveVisit);
   }, []);
 
   // Smooth scroll to top
@@ -130,6 +171,27 @@ export default function Home() {
         <p>
           If you have questions about a specific update, use the comments section on that update.
         </p>
+      </div>
+      <div className="search-and-filters">
+        <div className="search-wrap">
+          <label htmlFor="updates-search" className="search-label">
+            Search
+          </label>
+          <input
+            id="updates-search"
+            type="search"
+            className="search-input"
+            placeholder="Search by title or content…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label="Search updates by title or content"
+          />
+        </div>
+        {newSinceLastVisit > 0 && (
+          <p className="new-badge" aria-live="polite">
+            {newSinceLastVisit} new since your last visit
+          </p>
+        )}
       </div>
       <div className="category-tabs">
         <button
@@ -178,23 +240,37 @@ export default function Home() {
           <div className="empty-state">
             <div className="empty-icon">🔍</div>
             <h3>No Updates Found</h3>
-            <p>No updates found{selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}.</p>
-            {selectedCategory !== "All" && (
-              <button 
-                className="btn btn-secondary" 
-                onClick={() => setSelectedCategory("All")}
-                style={{ marginTop: "1rem" }}
-              >
-                View All Updates
-              </button>
-            )}
+            <p>
+              {searchQuery.trim()
+                ? "No updates match your search. Try different keywords or clear the search."
+                : `No updates found${selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}.`}
+            </p>
+            <div className="empty-state-actions" style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+              {searchQuery.trim() && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setSearchQuery("")}
+                >
+                  Clear search
+                </button>
+              )}
+              {selectedCategory !== "All" && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedCategory("All")}
+                >
+                  View All Updates
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <>
             <div className="updates-header">
               <p className="updates-count">
-                {filteredUpdates.length} {filteredUpdates.length === 1 ? "update" : "updates"}
-                {selectedCategory !== "All" && ` in ${selectedCategory}`}
+                {searchFilteredUpdates.length} {searchFilteredUpdates.length === 1 ? "update" : "updates"}
+                {searchQuery.trim() && " (filtered by search)"}
+                {selectedCategory !== "All" && !searchQuery.trim() && ` in ${selectedCategory}`}
               </p>
             </div>
             {updatesByDate.map(([date, dateUpdates]) => (

@@ -157,6 +157,12 @@
   z-index: 1;
 }
 
+.route-loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+}
+
 
 @media (max-width: 768px) {
   .app-header-content {

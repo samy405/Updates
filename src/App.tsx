@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
-import UpdatePage from "./pages/UpdatePage";
 import "./App.css";
+
+const UpdatePage = lazy(() => import("./pages/UpdatePage"));
 
 function App() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -53,10 +54,12 @@ function App() {
         </div>
       </header>
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/update/:id" element={<UpdatePage />} />
-        </Routes>
+        <Suspense fallback={<div className="route-loading">Loading…</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/update/:id" element={<UpdatePage />} />
+          </Routes>
+        </Suspense>
       </main>
     </BrowserRouter>
   );

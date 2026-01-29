@@ -30,7 +30,14 @@ This project reads a single Word document (`CSupdates.docx`) that contains Slack
    npm install
    ```
 
-2. **Configure Giscus** (for discussion threads):
+2. **Environment variables (for comments):**
+   Copy `.env.example` to `.env` and set:
+   - `VITE_SUPABASE_URL` – your Supabase project URL (Project Settings → API)
+   - `VITE_SUPABASE_ANON_KEY` – your Supabase anon/public key
+
+   Without these, the site runs normally but the comment section on update pages is disabled.
+
+3. **Configure Giscus** (for discussion threads – optional legacy):
    - Go to [giscus.app](https://giscus.app) and configure it for your GitHub repo
    - Update the giscus configuration in `src/pages/UpdatePage.tsx`:
      - Replace `YOUR_REPO_OWNER/YOUR_REPO_NAME` with your actual repo
@@ -159,6 +166,14 @@ This is a static site that can be deployed to:
 - Any static hosting service
 
 Ensure `data/updates.json` is included in your build (it should be by default).
+
+## Comments moderation (future)
+
+Comments are stored in Supabase (`public.comments`). To add moderation later:
+
+- **Hide/delete spam:** Add a `hidden` or `deleted` column (boolean) and update RLS so anonymous users only see rows where `hidden = false`. Use the Supabase Dashboard or a small admin page to set `hidden = true` or delete rows.
+- **Report flow:** Optionally add a `reports` table (e.g. `comment_id`, `reported_at`) or a `reported` flag on `comments`, and a "Report" button in the UI that inserts/updates via Supabase. Moderators can then filter by reported in the Dashboard.
+- **Admin view:** Use Supabase Dashboard → Table Editor for quick moderation, or build a simple internal page that uses the service role key (server-side only) to list and hide/delete comments.
 
 ## Notes
 

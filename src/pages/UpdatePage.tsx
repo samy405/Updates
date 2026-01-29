@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Update, UpdatesData } from "../types";
 import { supabase } from "../utils/supabaseClient";
+import { setPageMeta } from "../utils/pageMeta";
 import "./UpdatePage.css";
 
 interface Comment {
@@ -72,6 +73,20 @@ export default function UpdatePage() {
   useEffect(() => {
     reloadComments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [update]);
+
+  // Document title and Open Graph for sharing
+  useEffect(() => {
+    if (update) {
+      const description =
+        update.body.replace(/\s+/g, " ").trim().slice(0, 160) +
+        (update.body.length > 160 ? "…" : "");
+      setPageMeta({
+        title: `Update: ${update.title}`,
+        description,
+        ogImage: "/brand/fountain-logo.png",
+      });
+    }
   }, [update]);
 
   useEffect(() => {
