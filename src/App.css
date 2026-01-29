@@ -51,20 +51,10 @@
 }
 
 .fountain-logo {
-  height: 37.5px; /* 25% increase from 30px */
+  height: 97.5px; /* 2x decrease from 195px */
   width: auto;
   display: block;
   object-fit: contain;
-  /* Remove white background - make white transparent using multiply blend mode */
-  mix-blend-mode: multiply;
-  filter: contrast(1.15) brightness(0.9);
-}
-
-/* Remove white background in dark mode */
-:root[data-theme="dark"] .fountain-logo {
-  /* Use screen blend mode to make white transparent in dark backgrounds */
-  mix-blend-mode: screen;
-  filter: brightness(1.15) contrast(1.15);
 }
 
 .header-title {

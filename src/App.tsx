@@ -37,7 +37,7 @@ function App() {
         <div className="app-header-content">
           <Link to="/" className="logo-link">
             <img 
-              src="/brand/fountain-logo.png" 
+              src="/brand/fountain-logo.png?v=3" 
               alt="Fountain" 
               className="fountain-logo"
             />
