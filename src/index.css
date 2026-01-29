@@ -54,32 +54,7 @@ body {
   background-color: var(--bg);
 }
 
-/* Metallic/Glassy Background Objects - Layer 1: Large diagonal glass panel */
-body::before {
-  content: "";
-  position: fixed;
-  top: -20%;
-  left: -10%;
-  width: 60%;
-  height: 140%;
-  z-index: 0;
-  pointer-events: none;
-  transform: rotate(15deg);
-  background: linear-gradient(135deg, 
-    rgba(13, 148, 136, 0.08) 0%,
-    rgba(13, 148, 136, 0.12) 50%,
-    rgba(13, 148, 136, 0.08) 100%
-  );
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(13, 148, 136, 0.15);
-  border-radius: 2px;
-  box-shadow: 
-    0 0 60px rgba(13, 148, 136, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  animation: glassPanel1 120s ease-in-out infinite;
-}
+/* Layer 1: Removed - no gridlines */
 
 :root[data-theme="dark"] body::before {
   background: linear-gradient(135deg, 
@@ -111,8 +86,59 @@ body::before {
   z-index: 1;
 }
 
-/* Layer 2: Vertical metallic ribbon */
+/* Layer 2: Large diagonal glass panel - data visualization surface */
 #root::before {
+  content: "";
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 140%;
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(15deg);
+  background: linear-gradient(135deg, 
+    rgba(13, 148, 136, 0.08) 0%,
+    rgba(13, 148, 136, 0.12) 50%,
+    rgba(13, 148, 136, 0.08) 100%
+  );
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.15);
+  border-radius: 2px;
+  box-shadow: 
+    0 0 60px rgba(13, 148, 136, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  animation: glassPanel1 120s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] #root::before {
+  background: linear-gradient(135deg, 
+    rgba(20, 184, 166, 0.1) 0%,
+    rgba(20, 184, 166, 0.15) 50%,
+    rgba(20, 184, 166, 0.1) 100%
+  );
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  box-shadow: 
+    0 0 80px rgba(20, 184, 166, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+@keyframes glassPanel1 {
+  0%, 100% {
+    transform: rotate(15deg) translate(0, 0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(18deg) translate(15%, 10%);
+    opacity: 0.8;
+  }
+}
+
+/* Layer 3: Vertical data conduit - energy flow */
+#root::after {
   content: "";
   position: fixed;
   top: 10%;
@@ -132,10 +158,10 @@ body::before {
     0 0 20px rgba(13, 148, 136, 0.3),
     0 0 40px rgba(13, 148, 136, 0.2),
     inset 0 0 10px rgba(255, 255, 255, 0.3);
-  animation: metallicRibbon 100s ease-in-out infinite;
+  animation: dataFlow 8s ease-in-out infinite;
 }
 
-:root[data-theme="dark"] #root::before {
+:root[data-theme="dark"] #root::after {
   background: linear-gradient(180deg,
     transparent 0%,
     rgba(20, 184, 166, 0.25) 20%,
@@ -143,25 +169,26 @@ body::before {
     rgba(20, 184, 166, 0.25) 80%,
     transparent 100%
   );
+  background-size: 100% 200%;
   box-shadow: 
     0 0 30px rgba(20, 184, 166, 0.4),
     0 0 60px rgba(20, 184, 166, 0.3),
     inset 0 0 15px rgba(255, 255, 255, 0.2);
 }
 
-@keyframes metallicRibbon {
+@keyframes dataFlow {
   0%, 100% {
-    transform: translateY(0) scaleY(1);
     opacity: 0.7;
+    filter: brightness(1);
   }
   50% {
-    transform: translateY(-15%) scaleY(1.1);
     opacity: 0.9;
+    filter: brightness(1.3);
   }
 }
 
-/* Layer 3: Horizontal glass panel */
-#root::after {
+/* Layer 4: Horizontal data processing panel */
+body::after {
   content: "";
   position: fixed;
   bottom: -15%;
@@ -171,11 +198,22 @@ body::before {
   z-index: 0;
   pointer-events: none;
   transform: rotate(-8deg);
-  background: linear-gradient(90deg,
-    rgba(13, 148, 136, 0.06) 0%,
-    rgba(13, 148, 136, 0.1) 50%,
-    rgba(13, 148, 136, 0.06) 100%
-  );
+  background: 
+    linear-gradient(90deg,
+      rgba(13, 148, 136, 0.06) 0%,
+      rgba(13, 148, 136, 0.1) 50%,
+      rgba(13, 148, 136, 0.06) 100%
+    ),
+    /* Scanning line effect */
+    linear-gradient(
+      0deg,
+      transparent 0%,
+      transparent 48%,
+      rgba(13, 148, 136, 0.2) 49%,
+      rgba(13, 148, 136, 0.2) 51%,
+      transparent 52%,
+      transparent 100%
+    );
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   border: 1px solid rgba(13, 148, 136, 0.12);
@@ -184,20 +222,41 @@ body::before {
     0 0 50px rgba(13, 148, 136, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     inset 0 -1px 0 rgba(0, 0, 0, 0.08);
-  animation: glassPanel2 140s ease-in-out infinite;
+  background-size: 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
+  animation: scanPanel 6s linear infinite, glassPanel2 140s ease-in-out infinite;
 }
 
-:root[data-theme="dark"] #root::after {
-  background: linear-gradient(90deg,
-    rgba(20, 184, 166, 0.08) 0%,
-    rgba(20, 184, 166, 0.12) 50%,
-    rgba(20, 184, 166, 0.08) 100%
-  );
+:root[data-theme="dark"] body::after {
+  background: 
+    linear-gradient(90deg,
+      rgba(20, 184, 166, 0.08) 0%,
+      rgba(20, 184, 166, 0.12) 50%,
+      rgba(20, 184, 166, 0.08) 100%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 0%,
+      transparent 48%,
+      rgba(20, 184, 166, 0.25) 49%,
+      rgba(20, 184, 166, 0.25) 51%,
+      transparent 52%,
+      transparent 100%
+    );
   border: 1px solid rgba(20, 184, 166, 0.18);
   box-shadow: 
     0 0 70px rgba(20, 184, 166, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
+@keyframes scanPanel {
+  0% {
+    background-position: 0 0, 0 -100%;
+  }
+  100% {
+    background-position: 0 0, 0 200%;
+  }
 }
 
 @keyframes glassPanel2 {
@@ -208,56 +267,6 @@ body::before {
   50% {
     transform: rotate(-10deg) translate(-10%, 5%);
     opacity: 0.7;
-  }
-}
-
-/* Layer 4: Additional metallic element */
-body::after {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 5%;
-  width: 300px;
-  height: 2px;
-  z-index: 0;
-  pointer-events: none;
-  transform: rotate(45deg);
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(13, 148, 136, 0.15) 30%,
-    rgba(13, 148, 136, 0.3) 50%,
-    rgba(13, 148, 136, 0.15) 70%,
-    transparent 100%
-  );
-  box-shadow: 
-    0 0 15px rgba(13, 148, 136, 0.25),
-    0 0 30px rgba(13, 148, 136, 0.15),
-    inset 0 0 8px rgba(255, 255, 255, 0.25);
-  animation: metallicLine 130s ease-in-out infinite;
-}
-
-:root[data-theme="dark"] body::after {
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(20, 184, 166, 0.2) 30%,
-    rgba(20, 184, 166, 0.4) 50%,
-    rgba(20, 184, 166, 0.2) 70%,
-    transparent 100%
-  );
-  box-shadow: 
-    0 0 20px rgba(20, 184, 166, 0.3),
-    0 0 40px rgba(20, 184, 166, 0.2),
-    inset 0 0 10px rgba(255, 255, 255, 0.2);
-}
-
-@keyframes metallicLine {
-  0%, 100% {
-    transform: rotate(45deg) translate(0, 0);
-    opacity: 0.6;
-  }
-  50% {
-    transform: rotate(48deg) translate(8%, -8%);
-    opacity: 0.8;
   }
 }
 
