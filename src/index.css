@@ -54,29 +54,115 @@ body {
   background-color: var(--bg);
 }
 
-/* Layer 1: Removed - no gridlines */
+/* ============================================
+   CONTINUOUS FLOWING SYSTEM - BACKGROUND
+   ============================================ */
 
-:root[data-theme="dark"] body::before {
-  background: linear-gradient(135deg, 
-    rgba(20, 184, 166, 0.1) 0%,
-    rgba(20, 184, 166, 0.15) 50%,
-    rgba(20, 184, 166, 0.1) 100%
+/* Layer 1: Continuous vertical data stream - flows upward */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 12%;
+  width: 2px;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 8%,
+    rgba(13, 148, 136, 0.3) 8%,
+    rgba(13, 148, 136, 0.5) 10%,
+    rgba(13, 148, 136, 0.3) 12%,
+    transparent 12%,
+    transparent 20%
   );
-  border: 1px solid rgba(20, 184, 166, 0.2);
+  background-size: 100% 200px;
+  background-position: 0 0;
   box-shadow: 
-    0 0 80px rgba(20, 184, 166, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    0 0 20px rgba(13, 148, 136, 0.4),
+    0 0 40px rgba(13, 148, 136, 0.25),
+    inset 0 0 10px rgba(255, 255, 255, 0.3);
+  animation: verticalStream 4s linear infinite;
 }
 
-@keyframes glassPanel1 {
-  0%, 100% {
-    transform: rotate(15deg) translate(0, 0);
-    opacity: 0.6;
+:root[data-theme="dark"] body::before {
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 8%,
+    rgba(20, 184, 166, 0.4) 8%,
+    rgba(20, 184, 166, 0.6) 10%,
+    rgba(20, 184, 166, 0.4) 12%,
+    transparent 12%,
+    transparent 20%
+  );
+  box-shadow: 
+    0 0 25px rgba(20, 184, 166, 0.5),
+    0 0 50px rgba(20, 184, 166, 0.35),
+    inset 0 0 12px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes verticalStream {
+  0% {
+    background-position: 0 0;
   }
-  50% {
-    transform: rotate(18deg) translate(15%, 10%);
-    opacity: 0.8;
+  100% {
+    background-position: 0 200px;
+  }
+}
+
+/* Layer 2: Continuous horizontal data stream - flows left to right */
+body::after {
+  content: "";
+  position: fixed;
+  top: 40%;
+  left: 0;
+  width: 100vw;
+  height: 1.5px;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 15%,
+    rgba(13, 148, 136, 0.25) 15%,
+    rgba(13, 148, 136, 0.45) 17%,
+    rgba(13, 148, 136, 0.25) 19%,
+    transparent 19%,
+    transparent 30%
+  );
+  background-size: 300px 100%;
+  background-position: 0 0;
+  box-shadow: 
+    0 0 15px rgba(13, 148, 136, 0.4),
+    0 0 30px rgba(13, 148, 136, 0.25);
+  animation: horizontalStream 5s linear infinite;
+}
+
+:root[data-theme="dark"] body::after {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 15%,
+    rgba(20, 184, 166, 0.3) 15%,
+    rgba(20, 184, 166, 0.5) 17%,
+    rgba(20, 184, 166, 0.3) 19%,
+    transparent 19%,
+    transparent 30%
+  );
+  box-shadow: 
+    0 0 20px rgba(20, 184, 166, 0.5),
+    0 0 40px rgba(20, 184, 166, 0.35);
+}
+
+@keyframes horizontalStream {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 300px 0;
   }
 }
 
@@ -86,200 +172,116 @@ body {
   z-index: 1;
 }
 
-/* Layer 2: Multiple medium-sized glass panels */
+/* Layer 3: Continuous diagonal scanning beam - sweeps across */
 #root::before {
   content: "";
   position: fixed;
-  top: 15%;
-  left: 5%;
-  width: 25%;
-  height: 40%;
+  top: -20%;
+  left: -20%;
+  width: 150%;
+  height: 150%;
   z-index: 0;
   pointer-events: none;
-  transform: rotate(12deg);
-  background: linear-gradient(135deg, 
-    rgba(13, 148, 136, 0.08) 0%,
-    rgba(13, 148, 136, 0.12) 50%,
-    rgba(13, 148, 136, 0.08) 100%
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 48%,
+    rgba(13, 148, 136, 0.15) 49%,
+    rgba(13, 148, 136, 0.25) 50%,
+    rgba(13, 148, 136, 0.15) 51%,
+    transparent 52%,
+    transparent 100%
   );
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(13, 148, 136, 0.15);
-  border-radius: 2px;
-  box-shadow: 
-    0 0 60px rgba(13, 148, 136, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  animation: glassPanel1 96s ease-in-out infinite;
+  background-size: 200% 200%;
+  background-position: 0% 0%;
+  animation: diagonalScan 8s linear infinite;
 }
 
 :root[data-theme="dark"] #root::before {
-  background: linear-gradient(135deg, 
-    rgba(20, 184, 166, 0.1) 0%,
-    rgba(20, 184, 166, 0.15) 50%,
-    rgba(20, 184, 166, 0.1) 100%
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 48%,
+    rgba(20, 184, 166, 0.2) 49%,
+    rgba(20, 184, 166, 0.35) 50%,
+    rgba(20, 184, 166, 0.2) 51%,
+    transparent 52%,
+    transparent 100%
   );
-  border: 1px solid rgba(20, 184, 166, 0.2);
-  box-shadow: 
-    0 0 80px rgba(20, 184, 166, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
-@keyframes glassPanel1 {
-  0%, 100% {
-    transform: rotate(12deg) translate(0, 0);
-    opacity: 0.6;
+@keyframes diagonalScan {
+  0% {
+    background-position: -100% -100%;
   }
-  50% {
-    transform: rotate(15deg) translate(12%, 8%);
-    opacity: 0.8;
+  100% {
+    background-position: 100% 100%;
   }
 }
 
-/* Layer 3: Vertical data conduit - energy flow */
+/* Layer 4: Flowing energy particles - continuous loop */
 #root::after {
   content: "";
   position: fixed;
-  top: 10%;
-  right: 15%;
-  width: 2px;
-  height: 80%;
+  top: 20%;
+  left: 8%;
+  width: 300px;
+  height: 2px;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(180deg,
+  transform: rotate(35deg);
+  background: repeating-linear-gradient(
+    90deg,
     transparent 0%,
-    rgba(13, 148, 136, 0.2) 20%,
-    rgba(13, 148, 136, 0.4) 50%,
-    rgba(13, 148, 136, 0.2) 80%,
+    transparent 40%,
+    rgba(13, 148, 136, 0.4) 40%,
+    rgba(13, 148, 136, 0.6) 42%,
+    rgba(13, 148, 136, 0.4) 44%,
+    transparent 44%,
     transparent 100%
   );
-  box-shadow: 
-    0 0 20px rgba(13, 148, 136, 0.3),
-    0 0 40px rgba(13, 148, 136, 0.2),
-    inset 0 0 10px rgba(255, 255, 255, 0.3);
-  background-size: 100% 200%;
+  background-size: 100px 100%;
   background-position: 0 0;
-  animation: dataFlow 6.4s ease-in-out infinite, dataStream 9.6s linear infinite;
+  box-shadow: 
+    0 0 12px rgba(13, 148, 136, 0.5),
+    0 0 25px rgba(13, 148, 136, 0.3);
+  animation: particleFlow 3s linear infinite, particleDrift 12s ease-in-out infinite;
 }
 
 :root[data-theme="dark"] #root::after {
-  background: linear-gradient(180deg,
+  background: repeating-linear-gradient(
+    90deg,
     transparent 0%,
-    rgba(20, 184, 166, 0.25) 20%,
-    rgba(20, 184, 166, 0.5) 50%,
-    rgba(20, 184, 166, 0.25) 80%,
+    transparent 40%,
+    rgba(20, 184, 166, 0.5) 40%,
+    rgba(20, 184, 166, 0.7) 42%,
+    rgba(20, 184, 166, 0.5) 44%,
+    transparent 44%,
     transparent 100%
   );
-  background-size: 100% 200%;
-  background-position: 0 0;
-  animation: dataFlow 6.4s ease-in-out infinite, dataStream 9.6s linear infinite;
   box-shadow: 
-    0 0 30px rgba(20, 184, 166, 0.4),
-    0 0 60px rgba(20, 184, 166, 0.3),
-    inset 0 0 15px rgba(255, 255, 255, 0.2);
+    0 0 15px rgba(20, 184, 166, 0.6),
+    0 0 30px rgba(20, 184, 166, 0.4);
 }
 
-@keyframes dataStream {
+@keyframes particleFlow {
   0% {
     background-position: 0 0;
   }
   100% {
-    background-position: 0 100%;
+    background-position: 100px 0;
   }
 }
 
-@keyframes dataFlow {
+@keyframes particleDrift {
   0%, 100% {
-    opacity: 0.7;
-    filter: brightness(1);
+    transform: rotate(35deg) translate(0, 0);
   }
-  50% {
-    opacity: 0.9;
-    filter: brightness(1.3);
+  33% {
+    transform: rotate(38deg) translate(40px, -30px);
   }
-}
-
-/* Layer 4: Additional medium glass panel */
-body::after {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 12%;
-  width: 22%;
-  height: 35%;
-  z-index: 0;
-  pointer-events: none;
-  transform: rotate(-10deg);
-  background: 
-    linear-gradient(90deg,
-      rgba(13, 148, 136, 0.06) 0%,
-      rgba(13, 148, 136, 0.1) 50%,
-      rgba(13, 148, 136, 0.06) 100%
-    ),
-    /* Scanning line effect */
-    linear-gradient(
-      0deg,
-      transparent 0%,
-      transparent 48%,
-      rgba(13, 148, 136, 0.2) 49%,
-      rgba(13, 148, 136, 0.2) 51%,
-      transparent 52%,
-      transparent 100%
-    );
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(13, 148, 136, 0.12);
-  border-radius: 2px;
-  box-shadow: 
-    0 0 50px rgba(13, 148, 136, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
-  background-size: 100% 100%, 100% 100%;
-  background-position: 0 0, 0 0;
-  animation: scanPanel 4.8s linear infinite, glassPanel2 112s ease-in-out infinite;
-}
-
-:root[data-theme="dark"] body::after {
-  background: 
-    linear-gradient(90deg,
-      rgba(20, 184, 166, 0.08) 0%,
-      rgba(20, 184, 166, 0.12) 50%,
-      rgba(20, 184, 166, 0.08) 100%
-    ),
-    linear-gradient(
-      0deg,
-      transparent 0%,
-      transparent 48%,
-      rgba(20, 184, 166, 0.25) 49%,
-      rgba(20, 184, 166, 0.25) 51%,
-      transparent 52%,
-      transparent 100%
-    );
-  border: 1px solid rgba(20, 184, 166, 0.18);
-  box-shadow: 
-    0 0 70px rgba(20, 184, 166, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-}
-
-@keyframes scanPanel {
-  0% {
-    background-position: 0 0, 0 -100%;
-  }
-  100% {
-    background-position: 0 0, 0 200%;
-  }
-}
-
-@keyframes glassPanel2 {
-  0%, 100% {
-    transform: rotate(-10deg) translate(0, 0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: rotate(-12deg) translate(-8%, 4%);
-    opacity: 0.7;
+  66% {
+    transform: rotate(32deg) translate(-20px, 25px);
   }
 }
 
