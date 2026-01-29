@@ -68,6 +68,13 @@
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.01em;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(13, 148, 136, 0.2);
+  display: inline-block;
+}
+
+:root[data-theme="dark"] .welcome-message h2 {
+  border-bottom: 1px solid rgba(20, 184, 166, 0.3);
 }
 
 .welcome-message p {
