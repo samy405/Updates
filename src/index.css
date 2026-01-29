@@ -55,96 +55,90 @@ body {
 }
 
 /* ============================================
-   STRUCTURED TECHNOLOGICAL FIELD - BACKGROUND
+   LAYERED TRANSLUCENT GLASS PANELS - BACKGROUND
    ============================================ */
 
-/* Layer 1: Subtle structured grid - continuous vertical movement */
+/* Panel 1: Large soft-edged glass sheet - drifts diagonally */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -15%;
+  left: -10%;
+  width: 50%;
+  height: 130%;
   z-index: 0;
   pointer-events: none;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 99px,
-      rgba(13, 148, 136, 0.03) 99px,
-      rgba(13, 148, 136, 0.03) 100px
-    );
-  background-size: 100% 100px;
-  background-position: 0 0;
-  animation: gridFlowVertical 20s linear infinite;
-  opacity: 0.6;
+  background: rgba(13, 148, 136, 0.06);
+  backdrop-filter: blur(60px) saturate(180%);
+  -webkit-backdrop-filter: blur(60px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.08);
+  border-radius: 0;
+  box-shadow: 
+    0 0 80px rgba(13, 148, 136, 0.05),
+    inset 0 0 100px rgba(255, 255, 255, 0.02);
+  transform: rotate(8deg);
+  animation: panelDrift1 120s ease-in-out infinite;
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
 }
 
 :root[data-theme="dark"] body::before {
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 99px,
-      rgba(20, 184, 166, 0.04) 99px,
-      rgba(20, 184, 166, 0.04) 100px
-    );
-  opacity: 0.7;
+  background: rgba(20, 184, 166, 0.08);
+  border: 1px solid rgba(20, 184, 166, 0.12);
+  box-shadow: 
+    0 0 100px rgba(20, 184, 166, 0.08),
+    inset 0 0 100px rgba(255, 255, 255, 0.01);
 }
 
-@keyframes gridFlowVertical {
-  0% {
-    background-position: 0 0;
+@keyframes panelDrift1 {
+  0%, 100% {
+    transform: rotate(8deg) translate(0, 0);
+    opacity: 0.7;
   }
-  100% {
-    background-position: 0 100px;
+  50% {
+    transform: rotate(10deg) translate(8%, 5%);
+    opacity: 0.9;
   }
 }
 
-/* Layer 2: Horizontal flow lanes - continuous horizontal movement */
+/* Panel 2: Overlapping glass sheet - drifts in opposite direction */
 body::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 20%;
+  right: -8%;
+  width: 45%;
+  height: 120%;
   z-index: 0;
   pointer-events: none;
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 149px,
-      rgba(13, 148, 136, 0.025) 149px,
-      rgba(13, 148, 136, 0.025) 150px
-    );
-  background-size: 150px 100%;
-  background-position: 0 0;
-  animation: gridFlowHorizontal 25s linear infinite;
-  opacity: 0.5;
+  background: rgba(13, 148, 136, 0.05);
+  backdrop-filter: blur(50px) saturate(180%);
+  -webkit-backdrop-filter: blur(50px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.07);
+  border-radius: 0;
+  box-shadow: 
+    0 0 70px rgba(13, 148, 136, 0.04),
+    inset 0 0 90px rgba(255, 255, 255, 0.02);
+  transform: rotate(-6deg);
+  animation: panelDrift2 140s ease-in-out infinite;
+  clip-path: polygon(5% 0, 100% 0, 100% 100%, 0 100%);
 }
 
 :root[data-theme="dark"] body::after {
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 149px,
-      rgba(20, 184, 166, 0.035) 149px,
-      rgba(20, 184, 166, 0.035) 150px
-    );
-  opacity: 0.6;
+  background: rgba(20, 184, 166, 0.07);
+  border: 1px solid rgba(20, 184, 166, 0.1);
+  box-shadow: 
+    0 0 90px rgba(20, 184, 166, 0.07),
+    inset 0 0 90px rgba(255, 255, 255, 0.01);
 }
 
-@keyframes gridFlowHorizontal {
-  0% {
-    background-position: 0 0;
+@keyframes panelDrift2 {
+  0%, 100% {
+    transform: rotate(-6deg) translate(0, 0);
+    opacity: 0.6;
   }
-  100% {
-    background-position: 150px 0;
+  50% {
+    transform: rotate(-8deg) translate(-6%, 8%);
+    opacity: 0.8;
   }
 }
 
@@ -154,99 +148,87 @@ body::after {
   z-index: 1;
 }
 
-/* Layer 3: Diagonal flow channels - structured diagonal movement */
+/* Panel 3: Mid-layer glass sheet - creates depth */
 #root::before {
   content: "";
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  bottom: -12%;
+  left: 15%;
+  width: 55%;
+  height: 110%;
   z-index: 0;
   pointer-events: none;
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      transparent 0px,
-      transparent 199px,
-      rgba(13, 148, 136, 0.02) 199px,
-      rgba(13, 148, 136, 0.02) 200px
-    );
-  background-size: 200px 200px;
-  background-position: 0 0;
-  animation: gridFlowDiagonal 30s linear infinite;
-  opacity: 0.4;
+  background: rgba(13, 148, 136, 0.04);
+  backdrop-filter: blur(55px) saturate(180%);
+  -webkit-backdrop-filter: blur(55px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.06);
+  border-radius: 0;
+  box-shadow: 
+    0 0 75px rgba(13, 148, 136, 0.03),
+    inset 0 0 95px rgba(255, 255, 255, 0.015);
+  transform: rotate(12deg);
+  animation: panelDrift3 160s ease-in-out infinite;
+  clip-path: polygon(0 0, 100% 5%, 98% 100%, 2% 95%);
 }
 
 :root[data-theme="dark"] #root::before {
-  background-image: 
-    repeating-linear-gradient(
-      45deg,
-      transparent 0px,
-      transparent 199px,
-      rgba(20, 184, 166, 0.03) 199px,
-      rgba(20, 184, 166, 0.03) 200px
-    );
-  opacity: 0.5;
+  background: rgba(20, 184, 166, 0.06);
+  border: 1px solid rgba(20, 184, 166, 0.09);
+  box-shadow: 
+    0 0 85px rgba(20, 184, 166, 0.06),
+    inset 0 0 95px rgba(255, 255, 255, 0.008);
 }
 
-@keyframes gridFlowDiagonal {
-  0% {
-    background-position: 0 0;
+@keyframes panelDrift3 {
+  0%, 100% {
+    transform: rotate(12deg) translate(0, 0);
+    opacity: 0.5;
   }
-  100% {
-    background-position: 200px 200px;
+  50% {
+    transform: rotate(14deg) translate(5%, -7%);
+    opacity: 0.7;
   }
 }
 
-/* Layer 4: Flowing data lanes - horizontal channels with movement */
+/* Panel 4: Top layer glass sheet - subtle movement */
 #root::after {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 10%;
+  right: 20%;
+  width: 40%;
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 249px,
-      rgba(13, 148, 136, 0.04) 249px,
-      rgba(13, 148, 136, 0.06) 250px,
-      rgba(13, 148, 136, 0.04) 251px,
-      transparent 251px,
-      transparent 500px
-    );
-  background-size: 100% 500px;
-  background-position: 0 0;
-  animation: laneFlow 15s linear infinite;
-  opacity: 0.5;
+  background: rgba(13, 148, 136, 0.03);
+  backdrop-filter: blur(45px) saturate(180%);
+  -webkit-backdrop-filter: blur(45px) saturate(180%);
+  border: 1px solid rgba(13, 148, 136, 0.05);
+  border-radius: 0;
+  box-shadow: 
+    0 0 60px rgba(13, 148, 136, 0.025),
+    inset 0 0 85px rgba(255, 255, 255, 0.01);
+  transform: rotate(-10deg);
+  animation: panelDrift4 180s ease-in-out infinite;
+  clip-path: polygon(3% 0, 100% 3%, 97% 100%, 0 97%);
 }
 
 :root[data-theme="dark"] #root::after {
-  background-image: 
-    repeating-linear-gradient(
-      0deg,
-      transparent 0px,
-      transparent 249px,
-      rgba(20, 184, 166, 0.05) 249px,
-      rgba(20, 184, 166, 0.08) 250px,
-      rgba(20, 184, 166, 0.05) 251px,
-      transparent 251px,
-      transparent 500px
-    );
-  opacity: 0.6;
+  background: rgba(20, 184, 166, 0.05);
+  border: 1px solid rgba(20, 184, 166, 0.08);
+  box-shadow: 
+    0 0 80px rgba(20, 184, 166, 0.05),
+    inset 0 0 85px rgba(255, 255, 255, 0.005);
 }
 
-@keyframes laneFlow {
-  0% {
-    background-position: 0 0;
+@keyframes panelDrift4 {
+  0%, 100% {
+    transform: rotate(-10deg) translate(0, 0);
+    opacity: 0.4;
   }
-  100% {
-    background-position: 0 500px;
+  50% {
+    transform: rotate(-12deg) translate(-4%, 6%);
+    opacity: 0.6;
   }
 }
 
