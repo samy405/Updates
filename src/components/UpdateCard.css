@@ -5,12 +5,80 @@
   background: var(--surface);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.02) 50%, transparent 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 15px,
+      rgba(13, 148, 136, 0.01) 15px,
+      rgba(13, 148, 136, 0.01) 30px
+    );
+  background-size: 200% 200%, 60px 60px;
+  animation: cardMetallic 12s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .update-card {
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.03) 50%, transparent 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 15px,
+      rgba(20, 184, 166, 0.02) 15px,
+      rgba(20, 184, 166, 0.02) 30px
+    );
+}
+
+@keyframes cardMetallic {
+  0%, 100% {
+    background-position: 0% 0%, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 30px 30px;
+  }
 }
 
 .update-card:hover {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   border-color: var(--accent);
   transform: translateY(-2px);
+}
+
+.update-card:hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(13, 148, 136, 0.1),
+    transparent
+  );
+  animation: cardShimmer 1.5s ease-in-out;
+}
+
+:root[data-theme="dark"] .update-card:hover::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(20, 184, 166, 0.15),
+    transparent
+  );
+}
+
+@keyframes cardShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .update-card.superseded {
@@ -192,6 +260,28 @@
   background: var(--accent);
   color: white;
   border: 1px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 5px,
+      rgba(255, 255, 255, 0.05) 5px,
+      rgba(255, 255, 255, 0.05) 10px
+    );
+  background-size: 200% 200%, 20px 20px;
+  animation: buttonMetallic 4s linear infinite;
+}
+
+@keyframes buttonMetallic {
+  0% {
+    background-position: 0% 0%, 0 0;
+  }
+  100% {
+    background-position: 100% 100%, 20px 20px;
+  }
 }
 
 .btn-primary:hover {

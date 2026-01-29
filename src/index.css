@@ -49,6 +49,67 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated metallic/futuristic background texture */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: 
+    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.03) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(13, 148, 136, 0.02) 2px,
+      rgba(13, 148, 136, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(13, 148, 136, 0.02) 2px,
+      rgba(13, 148, 136, 0.02) 4px
+    );
+  background-size: 200% 200%, 40px 40px, 40px 40px;
+  animation: metallicShift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+:root[data-theme="dark"] body::before {
+  background: 
+    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.05) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(20, 184, 166, 0.03) 2px,
+      rgba(20, 184, 166, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(20, 184, 166, 0.03) 2px,
+      rgba(20, 184, 166, 0.03) 4px
+    );
+  background-size: 200% 200%, 40px 40px, 40px 40px;
+}
+
+@keyframes metallicShift {
+  0%, 100% {
+    background-position: 0% 0%, 0 0, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 20px 20px, -20px -20px;
+  }
 }
 
 a {

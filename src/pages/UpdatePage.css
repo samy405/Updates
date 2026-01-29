@@ -33,6 +33,40 @@
   padding: 3.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.02) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(13, 148, 136, 0.01) 2px,
+      rgba(13, 148, 136, 0.01) 4px
+    );
+  background-size: 200% 200%, 30px 30px;
+  animation: pageMetallic 18s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .update-content {
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.04) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(20, 184, 166, 0.02) 2px,
+      rgba(20, 184, 166, 0.02) 4px
+    );
+}
+
+@keyframes pageMetallic {
+  0%, 100% {
+    background-position: 0% 0%, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 15px 15px;
+  }
 }
 
 .update-header {

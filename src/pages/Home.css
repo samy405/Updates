@@ -9,6 +9,42 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-message::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(13, 148, 136, 0.1),
+    transparent
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .welcome-message::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(20, 184, 166, 0.15),
+    transparent
+  );
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .welcome-message h2 {
@@ -51,6 +87,40 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   letter-spacing: 0.01em;
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.05) 50%, transparent 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(13, 148, 136, 0.02) 10px,
+      rgba(13, 148, 136, 0.02) 20px
+    );
+  background-size: 200% 200%, 40px 40px;
+  animation: techPattern 8s linear infinite;
+}
+
+:root[data-theme="dark"] .category-tab {
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.08) 50%, transparent 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(20, 184, 166, 0.04) 10px,
+      rgba(20, 184, 166, 0.04) 20px
+    );
+}
+
+@keyframes techPattern {
+  0% {
+    background-position: 0% 0%, 0 0;
+  }
+  100% {
+    background-position: 100% 100%, 40px 40px;
+  }
 }
 
 .category-tab:hover {
@@ -65,6 +135,26 @@
   color: white;
   border-color: var(--accent);
   box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+  background-image: 
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(255, 255, 255, 0.05) 8px,
+      rgba(255, 255, 255, 0.05) 16px
+    );
+  background-size: 200% 200%, 32px 32px;
+  animation: activeShimmer 3s ease-in-out infinite, techPattern 6s linear infinite;
+}
+
+@keyframes activeShimmer {
+  0%, 100% {
+    background-position: 0% 0%, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 16px 16px;
+  }
 }
 
 .category-tab.active:hover {
@@ -99,6 +189,39 @@
   background: var(--surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.02) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(13, 148, 136, 0.01) 1px,
+      rgba(13, 148, 136, 0.01) 2px
+    );
+  background-size: 200% 200%, 20px 20px;
+  animation: subtleMetallic 15s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .date-group {
+  background-image: 
+    linear-gradient(135deg, transparent 0%, rgba(20, 184, 166, 0.04) 50%, transparent 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(20, 184, 166, 0.02) 1px,
+      rgba(20, 184, 166, 0.02) 2px
+    );
+}
+
+@keyframes subtleMetallic {
+  0%, 100% {
+    background-position: 0% 0%, 0 0;
+  }
+  50% {
+    background-position: 100% 100%, 10px 10px;
+  }
 }
 
 .date-group:hover {
@@ -119,6 +242,37 @@
   transition: background 0.2s ease;
   font-size: 1rem;
   font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.date-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(13, 148, 136, 0.08),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+:root[data-theme="dark"] .date-header::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(20, 184, 166, 0.12),
+    transparent
+  );
+}
+
+.date-header:hover::before {
+  left: 100%;
 }
 
 .date-header:hover {
