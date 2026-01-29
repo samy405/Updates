@@ -14,9 +14,6 @@ const CATEGORIES: UpdateCategory[] = [
   "Miscellaneous",
 ];
 
-// Debug flag for category audit panel
-const SHOW_DEBUG = true;
-
 // Normalize category strings for robust comparison
 function normalizeCategory(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLowerCase();
@@ -71,7 +68,12 @@ export default function Home() {
     return Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]));
   }, [filteredUpdates]);
 
-  // Expand first date by default
+  // Reset expanded dates when category changes to avoid stale state
+  useEffect(() => {
+    setExpandedDates(new Set());
+  }, [selectedCategory]);
+
+  // Expand first date by default (after category change resets expandedDates)
   useEffect(() => {
     if (expandedDates.size === 0 && updatesByDate.length > 0) {
       setExpandedDates(new Set([updatesByDate[0][0]]));
@@ -97,38 +99,21 @@ export default function Home() {
     });
   };
 
-  // This is the exact list we ultimately render (flattened across date groups)
-  const renderedList = filteredUpdates;
-
-  // Temporary debug logging for category filtering behavior
-  console.log("[filter]", {
-    selectedCategory,
-    allLen: allUpdates.length,
-    filteredLen: filteredUpdates.length,
-    renderedLen: renderedList.length,
-    renderedCats: renderedList.slice(0, 5).map((u) => u.category),
-  });
-
-  // Category audit: counts by exact category string in data
-  const categoryAudit = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const u of allUpdates) {
-      const key = (u.category ?? "") as string;
-      counts[key] = (counts[key] || 0) + 1;
-    }
-    const canonicalSet = new Set(CATEGORIES.map((c) => normalizeCategory(c)));
-    const entries = Object.entries(counts).map(([raw, count]) => {
-      const isCanonical = canonicalSet.has(normalizeCategory(raw));
-      const label = isCanonical ? raw : `OTHER("${raw}")`;
-      return { label, count };
-    });
-    // Stable display
-    entries.sort((a, b) => a.label.localeCompare(b.label));
-    return { total: allUpdates.length, entries };
-  }, [allUpdates]);
 
   return (
     <div className="home">
+      <div className="welcome-message">
+        <h2>Welcome to the Updates Hub</h2>
+        <p>
+          This page serves as the single source of truth for Customer Support updates across Fountain. Here you'll find important changes, reminders, and operational updates related to billing, pharmacy, labs, internal processes, and other CS-relevant workflows.
+        </p>
+        <p>
+          Updates are organized by category and date so you can quickly review what's new, what's changed, and what may no longer apply. Please check this page regularly, as it reflects the most up-to-date guidance from leadership and internal teams.
+        </p>
+        <p>
+          If you have questions about a specific update, use the comments section on that update.
+        </p>
+      </div>
       <div className="category-tabs">
         <button
           className={`category-tab ${selectedCategory === "All" ? "active" : ""}`}
@@ -170,19 +155,6 @@ export default function Home() {
                 {filteredUpdates.length} {filteredUpdates.length === 1 ? "update" : "updates"}
                 {selectedCategory !== "All" && ` in ${selectedCategory}`}
               </p>
-              {SHOW_DEBUG && (
-                <div className="updates-debug">
-                  <strong>Debug categories</strong>
-                  <div>Total: {categoryAudit.total}</div>
-                  <ul>
-                    {categoryAudit.entries.map((e) => (
-                      <li key={e.label}>
-                        {e.label}: {e.count}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
             {updatesByDate.map(([date, dateUpdates]) => (
             <div key={date} className="date-group">

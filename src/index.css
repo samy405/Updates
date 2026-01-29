@@ -1,5 +1,5 @@
 :root {
-  /* Fountain-inspired color system */
+  /* Fountain-inspired color system - Light mode */
   --bg: #fafbfc;
   --surface: #ffffff;
   --text: #1a1a1a;
@@ -24,6 +24,21 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="dark"] {
+  /* Dark mode color system */
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --border: #334155;
+  --accent: #14b8a6; /* Lighter teal for dark mode */
+  --accent-2: #2dd4bf;
+  --accent-light: #0f766e;
+  --accent-dark: #0d9488;
+
+  color-scheme: dark;
 }
 
 * {
