@@ -78,7 +78,7 @@ export default function UpdateCard({ update, selectedCategory = "All", commentCo
             className="btn btn-secondary"
             onClick={() => onDiscussClick(update.id)}
           >
-            Discuss
+            Quick view
           </button>
         ) : (
           <Link to={`/update/${update.id}#comments`} state={{ fromCategory: selectedCategory }} className="btn btn-secondary">
