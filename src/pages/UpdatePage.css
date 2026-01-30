@@ -471,10 +471,6 @@
   line-height: 1.5;
 }
 
-#giscus-container {
-  margin-top: 1rem;
-}
-
 @media (max-width: 768px) {
   .update-page-container {
     padding: 1rem;

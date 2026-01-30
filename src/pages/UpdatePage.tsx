@@ -43,37 +43,6 @@ export default function UpdatePage() {
     }
   }, [update]);
 
-  useEffect(() => {
-    // Load giscus script (optional - configure at https://giscus.app)
-    const script = document.createElement("script");
-    script.src = "https://giscus.app/client.js";
-    script.setAttribute("data-repo", "YOUR_REPO_OWNER/YOUR_REPO_NAME");
-    script.setAttribute("data-repo-id", "YOUR_REPO_ID");
-    script.setAttribute("data-category", "General");
-    script.setAttribute("data-category-id", "YOUR_CATEGORY_ID");
-    script.setAttribute("data-mapping", "pathname");
-    script.setAttribute("data-strict", "0");
-    script.setAttribute("data-reactions-enabled", "1");
-    script.setAttribute("data-emit-metadata", "0");
-    script.setAttribute("data-input-position", "bottom");
-    script.setAttribute("data-theme", "light");
-    script.setAttribute("data-lang", "en");
-    script.setAttribute("crossorigin", "anonymous");
-    script.async = true;
-
-    const giscusContainer = document.getElementById("giscus-container");
-    if (giscusContainer && !giscusContainer.querySelector("script")) {
-      giscusContainer.appendChild(script);
-    }
-
-    return () => {
-      const container = document.getElementById("giscus-container");
-      if (container) {
-        container.innerHTML = "";
-      }
-    };
-  }, [id]);
-
   if (loading) {
     return (
       <div className="update-page">
@@ -107,8 +76,6 @@ export default function UpdatePage() {
         <div className="update-content">
           <UpdateDetailWithComments update={update} updates={updates} />
         </div>
-
-        <div id="giscus-container" aria-hidden="true" />
       </div>
     </div>
   );

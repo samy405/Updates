@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import type { Update } from "../types";
 import { supabase } from "../utils/supabaseClient";
@@ -37,7 +37,7 @@ export default function UpdateDetailWithComments({
 
   const client = supabase;
 
-  const reloadComments = async () => {
+  const reloadComments = useCallback(async () => {
     if (!client || !update) return;
     setCommentsLoading(true);
     setCommentError(null);
@@ -53,11 +53,11 @@ export default function UpdateDetailWithComments({
       setComments(data as Comment[]);
     }
     setCommentsLoading(false);
-  };
+  }, [client, update?.id]);
 
   useEffect(() => {
     reloadComments();
-  }, [update?.id]);
+  }, [reloadComments]);
 
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();

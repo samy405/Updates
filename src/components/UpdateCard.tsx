@@ -7,7 +7,7 @@ interface UpdateCardProps {
   update: Update;
   selectedCategory?: UpdateCategory | "All";
   commentCount?: number;
-  /** When provided, Discuss opens the side panel instead of navigating */
+  /** When provided, Quick view opens the side panel instead of navigating */
   onDiscussClick?: (updateId: string) => void;
 }
 

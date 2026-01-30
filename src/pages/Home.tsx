@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
@@ -37,6 +37,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [panelUpdateId, setPanelUpdateId] = useState<string | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const panelCloseButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     setPageMeta({
@@ -179,10 +181,30 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const openDiscussPanel = (updateId: string) => setPanelUpdateId(updateId);
-  const closeDiscussPanel = () => setPanelUpdateId(null);
+  const openDiscussPanel = (updateId: string) => {
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    setPanelUpdateId(updateId);
+  };
+  const closeDiscussPanel = () => {
+    setPanelUpdateId(null);
+    // Restore focus to the button that opened the panel after panel unmounts
+    setTimeout(() => {
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
+    }, 0);
+  };
 
   const panelUpdate = panelUpdateId ? allUpdates.find((u) => u.id === panelUpdateId) : null;
+
+  // Body scroll lock when panel is open
+  useEffect(() => {
+    if (!panelUpdateId) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [panelUpdateId]);
 
   useEffect(() => {
     if (!panelUpdateId) return;
@@ -191,6 +213,13 @@ export default function Home() {
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
+  }, [panelUpdateId]);
+
+  // Focus the close button when panel opens
+  useEffect(() => {
+    if (panelUpdateId) {
+      panelCloseButtonRef.current?.focus();
+    }
   }, [panelUpdateId]);
 
   const toggleDate = (date: string) => {
@@ -380,13 +409,20 @@ export default function Home() {
         ↑
       </button>
 
-      {/* Discuss side panel */}
+      {/* Quick view side panel */}
       <div
         className={`discuss-panel-backdrop ${panelUpdateId ? "discuss-panel-backdrop--open" : ""}`}
         onClick={closeDiscussPanel}
-        role="presentation"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            closeDiscussPanel();
+          }
+        }}
+        role={panelUpdateId ? "button" : "presentation"}
+        tabIndex={panelUpdateId ? 0 : -1}
         aria-hidden={!panelUpdateId}
-        aria-label="Close panel"
+        aria-label={panelUpdateId ? "Close panel (click or press Escape)" : undefined}
       />
       <aside
         className={`discuss-panel ${panelUpdateId ? "discuss-panel--open" : ""}`}
@@ -395,8 +431,9 @@ export default function Home() {
       >
         <div className="discuss-panel-inner">
           <div className="discuss-panel-header">
-            <h2 className="discuss-panel-title">Discuss</h2>
+            <h2 className="discuss-panel-title">Quick view</h2>
             <button
+              ref={panelCloseButtonRef}
               type="button"
               className="discuss-panel-close"
               onClick={closeDiscussPanel}
