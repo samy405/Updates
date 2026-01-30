@@ -496,6 +496,22 @@ function generateId(title: string, datePosted: string): string {
   return `${dateSlug}-${slug}`;
 }
 
+/** Ensures every update has a unique id; appends -2, -3, etc. when duplicate. */
+function ensureUniqueIds(updates: Update[]): void {
+  const seen = new Set<string>();
+  for (const u of updates) {
+    let id = u.id;
+    let n = 2;
+    while (seen.has(id)) {
+      const base = u.id.replace(/-\d+$/, "") || u.id;
+      id = `${base}-${n}`;
+      n++;
+    }
+    seen.add(id);
+    u.id = id;
+  }
+}
+
 function parseDateHeading(text: string): Date | null {
   // Try to parse dates like "January 28, 2026" or "Jan 28, 2026" or "January 28, 2026" at start of line
   const trimmed = text.trim();
@@ -939,6 +955,21 @@ function extractTitle(body: string, category: UpdateCategory): string {
     return normalizeTitle("Lab charges applied outside subscription");
   }
   
+  // Before generic category fallback: try first bullet or first line for a distinct title
+  const firstBullet = cleaned.match(/(?:^|\n)[\-\*•]\s*([^\n]{5,80})(?:\n|$)/);
+  if (firstBullet && firstBullet[1]) {
+    const line = firstBullet[1].trim().replace(/\s+/g, " ");
+    if (line.length >= 10 && line.length <= 70 && !/^(updates?|reminders?)$/i.test(line)) {
+      const candidate = normalizeTitle(line);
+      if (candidate.length >= 8) return candidate;
+    }
+  }
+  const firstLine = cleaned.split(/\n+/)[0]?.trim().replace(/\s+/g, " ");
+  if (firstLine && firstLine.length >= 15 && firstLine.length <= 70) {
+    const candidate = normalizeTitle(firstLine.replace(/^[@\s#\-*•]+/, ""));
+    if (candidate.length >= 8) return candidate;
+  }
+
   // Fallback: generate from category and key terms
   const categoryTitles: Record<UpdateCategory, string> = {
     "Pharmacy": "Pharmacy process update",
@@ -950,7 +981,7 @@ function extractTitle(body: string, category: UpdateCategory): string {
     "Compliance / Clinical": "Compliance process update",
     "Miscellaneous": "Process update",
   };
-  
+
   return categoryTitles[category];
 }
 
@@ -1311,6 +1342,9 @@ async function ingestDocx(): Promise<void> {
 
   // Flush any trailing block (in case document is missing final delimiter)
   flushCurrentBlock();
+
+  // Ensure no duplicate IDs (same title+date can produce same id)
+  ensureUniqueIds(newUpdates);
 
   // VALIDATION REPORT
   console.log("=== Ingestion Validation Report ===");
