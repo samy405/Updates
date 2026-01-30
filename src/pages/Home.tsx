@@ -159,7 +159,9 @@ export default function Home() {
   };
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
+    // Parse as local date (YYYY-MM-DD) to avoid UTC midnight shifting to previous day
+    const [y, m, d] = dateStr.split("-").map(Number);
+    const date = new Date(y, (m ?? 1) - 1, d ?? 1);
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
