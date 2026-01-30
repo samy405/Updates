@@ -486,15 +486,29 @@ function cleanSlackText(text: string): string {
   return cleaned.trim();
 }
 
-/** Remove a leading line that is only a date (e.g. "January, 29, 2026:" from Word doc headers). */
+/**
+ * Remove a leading line that is a reference date (at top of doc/block), optionally followed by
+ * text (e.g. "January 29, 2026 (for my reference)" or "January, 29, 2026 - posted"). For your
+ * reference only—not included as update content. Dates within the update body are kept.
+ */
 function stripLeadingDateLine(body: string): string {
   const trimmed = body.trimStart();
   const firstNewline = trimmed.indexOf("\n");
   const firstLine = firstNewline >= 0 ? trimmed.slice(0, firstNewline).trim() : trimmed;
   const lineWithoutColon = firstLine.replace(/:\s*$/, "").trim();
+  // Exact date only (e.g. "January, 29, 2026")
   if (parseDateHeading(lineWithoutColon)) {
     const rest = firstNewline >= 0 ? trimmed.slice(firstNewline + 1).trimStart() : "";
     return rest.length > 0 ? rest : body;
+  }
+  // Date at start of line with extra text (e.g. "January, 29, 2026 (for my reference)")
+  const dateAtStart = firstLine.match(/^([A-Za-z]+,?\s+\d{1,2},?\s+\d{4})/i);
+  if (dateAtStart && dateAtStart[1]) {
+    const datePart = dateAtStart[1].trim().replace(/^([A-Za-z]+),\s*/, "$1 ");
+    if (parseDateHeading(datePart)) {
+      const rest = firstNewline >= 0 ? trimmed.slice(firstNewline + 1).trimStart() : "";
+      return rest.length > 0 ? rest : body;
+    }
   }
   return body;
 }

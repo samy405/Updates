@@ -1,8 +1,8 @@
 {
   "updates": [
     {
-      "id": "20260128-a-routing-error",
-      "datePosted": "2026-01-28",
+      "id": "20260130-a-routing-error",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Operations",
       "title": "A routing error",
@@ -14,8 +14,21 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-curexa-delays-when-asking-for-overnight-shipping",
-      "datePosted": "2026-01-28",
+      "id": "20260130-billing-process-update",
+      "datePosted": "2026-01-30",
+      "author": "",
+      "category": "Billing",
+      "title": "Billing process update",
+      "body": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that the link is good for 48hrs. We might see uptick in questions and evaluations. We cannot honor the promo outside of 48 hours.If you are unsure how to handle any questions regarding this, please send to the SS.We want to instruct the patient's to refer to the price given on their specific check out.The discounted price will be provided when patient's utilize the link provided within 48 hours of retrieval.If patient's are upset about this timeframe we cannot make adjustments. Once again we should direct them to what is reflected in their personal check out.",
+      "sourceExcerpt": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that the link is good for...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
+    },
+    {
+      "id": "20260130-curexa-delays-when-asking-for-overnight-shipping",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Pharmacy",
       "title": "Curexa Delays when asking for overnight shipping",
@@ -27,8 +40,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-employment-verification-over-phone-prohibited",
-      "datePosted": "2026-01-28",
+      "id": "20260130-employment-verification-over-phone-prohibited",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Compliance / Clinical",
       "title": "Employment verification over phone prohibited",
@@ -40,8 +53,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-existing-patient-price-change-process",
-      "datePosted": "2026-01-28",
+      "id": "20260130-existing-patient-price-change-process",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Billing",
       "title": "Existing patient price change process",
@@ -53,8 +66,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-failed-payments-caught-up",
-      "datePosted": "2026-01-28",
+      "id": "20260130-failed-payments-caught-up",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Billing",
       "title": "Failed Payments caught up",
@@ -66,8 +79,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-hrt-labs-not-required-for-pilot-program-patients",
-      "datePosted": "2026-01-28",
+      "id": "20260130-hrt-labs-not-required-for-pilot-program-patients",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "HRT labs not required for pilot program patients",
@@ -79,8 +92,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-hrt-unodose-instructions",
-      "datePosted": "2026-01-28",
+      "id": "20260130-hrt-unodose-instructions",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Pharmacy",
       "title": "HRT Unodose Instructions",
@@ -92,21 +105,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-january-29-2026",
-      "datePosted": "2026-01-28",
-      "author": "",
-      "category": "Billing",
-      "title": "SMS $26 evaluation promo (48-hour link)",
-      "body": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that the link is good for 48hrs. We might see uptick in questions and evaluations. We cannot honor the promo outside of 48 hours.If you are unsure how to handle any questions regarding this, please send to the SS.We want to instruct the patient's to refer to the price given on their specific check out.The discounted price will be provided when patient's utilize the link provided within 48 hours of retrieval.If patient's are upset about this timeframe we cannot make adjustments. Once again we should direct them to what is reflected in their personal check out.",
-      "sourceExcerpt": "@channel Good morning everyone. Here are some updates as we are moving into another Holiday.\n\nLeadership is sending out a SMS blast message tomorrow, January 1st, to our entire abandoned cart list that will be a promo for a $26 evaluation (trt and hrt). The SMS will include that ...",
-      "supersedesIds": [],
-      "supersededById": null,
-      "status": "active",
-      "needsAnswer": false
-    },
-    {
-      "id": "20260128-lab-scheduling-link-during-error",
-      "datePosted": "2026-01-28",
+      "id": "20260130-lab-scheduling-link-during-error",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "Lab scheduling link during error",
@@ -118,8 +118,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-lab-scheduling-link-issue",
-      "datePosted": "2026-01-28",
+      "id": "20260130-lab-scheduling-link-issue",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "Lab scheduling link issue",
@@ -131,8 +131,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-manual-lab-scheduling-prohibited",
-      "datePosted": "2026-01-28",
+      "id": "20260130-manual-lab-scheduling-prohibited",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "Manual lab scheduling prohibited",
@@ -144,8 +144,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-medication-requests-reassigned-to-rn-team",
-      "datePosted": "2026-01-28",
+      "id": "20260130-medication-requests-reassigned-to-rn-team",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Pharmacy",
       "title": "Medication requests reassigned to RN team",
@@ -157,8 +157,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-our-lab-scheduling-fix",
-      "datePosted": "2026-01-28",
+      "id": "20260130-our-lab-scheduling-fix",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "Our lab scheduling fix",
@@ -170,8 +170,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-patient-states-they-did-not-agree-to-auto-renewing",
-      "datePosted": "2026-01-28",
+      "id": "20260130-patient-states-they-did-not-agree-to-auto-renewing",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Billing",
       "title": "Patient states they did not agree to auto renewing subscription",
@@ -183,8 +183,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-progesterone-sublingual-300-mg-no-longer-offered",
-      "datePosted": "2026-01-28",
+      "id": "20260130-progesterone-sublingual-300-mg-no-longer-offered",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Pharmacy",
       "title": "Progesterone sublingual 300 mg no longer offered",
@@ -196,8 +196,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-relay-macro-rerouting-questions-and-concerns",
-      "datePosted": "2026-01-28",
+      "id": "20260130-relay-macro-rerouting-questions-and-concerns",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Operations",
       "title": "Relay Macro/Rerouting questions and concerns",
@@ -209,8 +209,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-requests-routed-to-shift-supervisor",
-      "datePosted": "2026-01-28",
+      "id": "20260130-requests-routed-to-shift-supervisor",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Billing",
       "title": "Requests routed to shift supervisor",
@@ -222,8 +222,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-requests-routed-to-shift-supervisor-2",
-      "datePosted": "2026-01-28",
+      "id": "20260130-requests-routed-to-shift-supervisor-2",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Operations",
       "title": "Requests routed to shift supervisor",
@@ -235,8 +235,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-resubscribing",
-      "datePosted": "2026-01-28",
+      "id": "20260130-resubscribing",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Operations",
       "title": "Resubscribing",
@@ -248,8 +248,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-sent-in-fix",
-      "datePosted": "2026-01-28",
+      "id": "20260130-sent-in-fix",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Labs",
       "title": "Sent in fix",
@@ -261,8 +261,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-third-party-patient-confirmation-prohibited",
-      "datePosted": "2026-01-28",
+      "id": "20260130-third-party-patient-confirmation-prohibited",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Compliance / Clinical",
       "title": "Third-party patient confirmation prohibited",
@@ -274,8 +274,8 @@
       "needsAnswer": false
     },
     {
-      "id": "20260128-updating-billing-information",
-      "datePosted": "2026-01-28",
+      "id": "20260130-updating-billing-information",
+      "datePosted": "2026-01-30",
       "author": "",
       "category": "Billing",
       "title": "Updating Billing Information",
@@ -285,7 +285,20 @@
       "supersededById": null,
       "status": "active",
       "needsAnswer": false
+    },
+    {
+      "id": "20260129-requests-routed-to-shift-supervisor",
+      "datePosted": "2026-01-29",
+      "author": "",
+      "category": "Compliance / Clinical",
+      "title": "Requests routed to shift supervisor",
+      "body": "Hi @channel we are working on an automation where the system will send a video visit or lab scheduling link to patient's upon request. However, before this automation is launched we want to ensure the system is providing the correct link/in the correct context.At this time the automation is not live, so please still respond to the patient with the requested link.In addition to responding to the patient please review the comment from the system. If the link proposed by the system is correct no further action is needed. However, if the link proposed by the system is wrong please tag the patient message with z.wrongTo tag the specific message please follow the below instruction. This will allow leadership team to go directly to this message for review.\n\nFirst hover over the patient message where link was requested.\n\nYou will then see a little tag icon appear. Once you select the tag icon, a menu will appear mid screen.\n\nPlease check the box of the appropriate tag (z.wrong).\n\nImages attached for referencePlease send to the Shift Supervisor team if any questions! @Jessica Booker will also review during 1:1s. Thanks team! I hope everyone has a wonderful week",
+      "sourceExcerpt": "Hi @channel we are working on an automation where the system will send a video visit or lab scheduling link to patient's upon request. However, before this automation is launched we want to ensure the system is providing the correct link/in the correct context.At this time the automation is not live...",
+      "supersedesIds": [],
+      "supersededById": null,
+      "status": "active",
+      "needsAnswer": false
     }
   ],
-  "lastIngestedDate": "2026-01-28"
+  "lastIngestedDate": "2026-01-30"
 }
