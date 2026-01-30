@@ -486,6 +486,19 @@ function cleanSlackText(text: string): string {
   return cleaned.trim();
 }
 
+/** Remove a leading line that is only a date (e.g. "January, 29, 2026:" from Word doc headers). */
+function stripLeadingDateLine(body: string): string {
+  const trimmed = body.trimStart();
+  const firstNewline = trimmed.indexOf("\n");
+  const firstLine = firstNewline >= 0 ? trimmed.slice(0, firstNewline).trim() : trimmed;
+  const lineWithoutColon = firstLine.replace(/:\s*$/, "").trim();
+  if (parseDateHeading(lineWithoutColon)) {
+    const rest = firstNewline >= 0 ? trimmed.slice(firstNewline + 1).trimStart() : "";
+    return rest.length > 0 ? rest : body;
+  }
+  return body;
+}
+
 function generateId(title: string, datePosted: string): string {
   const slug = title
     .toLowerCase()
@@ -966,8 +979,11 @@ function extractTitle(body: string, category: UpdateCategory): string {
   }
   const firstLine = cleaned.split(/\n+/)[0]?.trim().replace(/\s+/g, " ");
   if (firstLine && firstLine.length >= 15 && firstLine.length <= 70) {
-    const candidate = normalizeTitle(firstLine.replace(/^[@\s#\-*•]+/, ""));
-    if (candidate.length >= 8) return candidate;
+    const lineForTitle = firstLine.replace(/^[@\s#\-*•]+/, "").replace(/:\s*$/, "");
+    if (!parseDateHeading(lineForTitle)) {
+      const candidate = normalizeTitle(firstLine.replace(/^[@\s#\-*•]+/, ""));
+      if (candidate.length >= 8) return candidate;
+    }
   }
 
   // Fallback: generate from category and key terms
@@ -1280,6 +1296,7 @@ async function ingestDocx(): Promise<void> {
     let body = rawBody;
     body = preserveStructure(body);
     body = cleanSlackText(body);
+    body = stripLeadingDateLine(body);
 
     const dateStr = effectiveDate.toISOString().split("T")[0];
 
