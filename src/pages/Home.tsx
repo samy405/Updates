@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
 import { setPageMeta } from "../utils/pageMeta";
+import { supabase } from "../utils/supabaseClient";
 import "./Home.css";
 
 const CATEGORIES: UpdateCategory[] = [
@@ -29,6 +30,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
   const [allUpdates, setAllUpdates] = useState<Update[]>([]);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -68,6 +70,32 @@ export default function Home() {
         setError("Failed to load updates. Please refresh the page or check your connection.");
         setLoading(false);
       });
+  }, []);
+
+  // Fetch comment counts per update (for supervisor visibility)
+  useEffect(() => {
+    const client = supabase;
+    if (!client) return;
+    const loadCommentCounts = async () => {
+      try {
+        const { data, error } = await client.from("comments").select("update_id");
+        if (error) {
+          console.error("Failed to load comment counts:", error);
+          return;
+        }
+        if (!data) return;
+
+        const counts: Record<string, number> = {};
+        for (const row of data as Array<{ update_id: string }>) {
+          counts[row.update_id] = (counts[row.update_id] ?? 0) + 1;
+        }
+        setCommentCounts(counts);
+      } catch (err: unknown) {
+        console.error("Failed to load comment counts:", err);
+      }
+    };
+
+    loadCommentCounts();
   }, []);
 
   const filteredUpdates = useMemo(() => {
@@ -311,7 +339,7 @@ export default function Home() {
                       return 0;
                     })
                     .map((update) => (
-                      <UpdateCard key={update.id} update={update} selectedCategory={selectedCategory} />
+                      <UpdateCard key={update.id} update={update} selectedCategory={selectedCategory} commentCount={commentCounts[update.id] ?? 0} />
                     ))}
                 </div>
               )}

@@ -6,9 +6,10 @@ import "./UpdateCard.css";
 interface UpdateCardProps {
   update: Update;
   selectedCategory?: UpdateCategory | "All";
+  commentCount?: number;
 }
 
-export default function UpdateCard({ update, selectedCategory = "All" }: UpdateCardProps) {
+export default function UpdateCard({ update, selectedCategory = "All", commentCount = 0 }: UpdateCardProps) {
   const isSuperseded = update.status === "superseded";
   const summary = extractSummary(update.body);
   const isTruncated = update.body.length > summary.length;
@@ -32,6 +33,12 @@ export default function UpdateCard({ update, selectedCategory = "All" }: UpdateC
             <span className="update-meta-label">Category:</span>
             <span className="update-category">{update.category}</span>
           </span>
+          {commentCount > 0 && (
+            <span className="update-meta-item update-comment-count" aria-label={`${commentCount} comment${commentCount !== 1 ? "s" : ""}`}>
+              <span className="update-meta-label">Comments:</span>
+              <span className="update-comment-badge">{commentCount}</span>
+            </span>
+          )}
         </div>
       </div>
 
