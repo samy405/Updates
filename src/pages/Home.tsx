@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
 import { setPageMeta } from "../utils/pageMeta";
@@ -23,6 +24,7 @@ function normalizeCategory(value: string): string {
 const LAST_VISIT_KEY = "updates-hub-last-visit";
 
 export default function Home() {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<UpdateCategory | "All">("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
@@ -38,6 +40,14 @@ export default function Home() {
         "Single source of truth for Customer Support updates across Fountain. Browse updates by category and date.",
     });
   }, []);
+
+  // Restore category when returning from update detail via "Back to all updates"
+  useEffect(() => {
+    const category = (location.state as { category?: UpdateCategory | "All" } | null)?.category;
+    if (category && (category === "All" || CATEGORIES.includes(category))) {
+      setSelectedCategory(category);
+    }
+  }, [location.key, location.state]);
 
   useEffect(() => {
     // Load updates data
@@ -299,7 +309,7 @@ export default function Home() {
                       return 0;
                     })
                     .map((update) => (
-                      <UpdateCard key={update.id} update={update} />
+                      <UpdateCard key={update.id} update={update} selectedCategory={selectedCategory} />
                     ))}
                 </div>
               )}

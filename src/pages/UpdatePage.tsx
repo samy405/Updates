@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Update, UpdatesData } from "../types";
 import { supabase } from "../utils/supabaseClient";
@@ -15,6 +15,8 @@ interface Comment {
 
 export default function UpdatePage() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const fromCategory = (location.state as { fromCategory?: string } | null)?.fromCategory ?? "All";
   const [updates, setUpdates] = useState<Update[]>([]);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -137,7 +139,7 @@ export default function UpdatePage() {
       <div className="update-page">
         <div className="update-page-container">
           <h1>Update not found</h1>
-          <Link to="/" className="btn btn-primary">
+          <Link to="/" state={{ category: fromCategory }} className="btn btn-primary">
             ← Back to all updates
           </Link>
         </div>
@@ -257,7 +259,7 @@ export default function UpdatePage() {
   return (
     <div className="update-page">
       <div className="update-page-container">
-        <Link to="/" className="back-link">
+        <Link to="/" state={{ category: fromCategory }} className="back-link">
           ← Back to all updates
         </Link>
 

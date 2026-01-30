@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
-import type { Update } from "../types";
+import type { Update, UpdateCategory } from "../types";
 import { extractSummary } from "../utils/summary";
 import "./UpdateCard.css";
 
 interface UpdateCardProps {
   update: Update;
+  selectedCategory?: UpdateCategory | "All";
 }
 
-export default function UpdateCard({ update }: UpdateCardProps) {
+export default function UpdateCard({ update, selectedCategory = "All" }: UpdateCardProps) {
   const isSuperseded = update.status === "superseded";
   const summary = extractSummary(update.body);
   const isTruncated = update.body.length > summary.length;
@@ -43,7 +44,7 @@ export default function UpdateCard({ update }: UpdateCardProps) {
         <div className="superseded-notice">
           <p>
             <strong>Note:</strong> This update has been superseded.{" "}
-            <Link to={`/update/${update.supersededById}`}>
+            <Link to={`/update/${update.supersededById}`} state={{ fromCategory: selectedCategory }}>
               View replacement update →
             </Link>
           </p>
@@ -59,10 +60,10 @@ export default function UpdateCard({ update }: UpdateCardProps) {
       )}
 
       <div className="update-card-actions">
-        <Link to={`/update/${update.id}`} className="btn btn-primary">
+        <Link to={`/update/${update.id}`} state={{ fromCategory: selectedCategory }} className="btn btn-primary">
           View
         </Link>
-        <Link to={`/update/${update.id}#comments`} className="btn btn-secondary">
+        <Link to={`/update/${update.id}#comments`} state={{ fromCategory: selectedCategory }} className="btn btn-secondary">
           Discuss
         </Link>
       </div>
