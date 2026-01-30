@@ -7,9 +7,11 @@ interface UpdateCardProps {
   update: Update;
   selectedCategory?: UpdateCategory | "All";
   commentCount?: number;
+  /** When provided, Discuss opens the side panel instead of navigating */
+  onDiscussClick?: (updateId: string) => void;
 }
 
-export default function UpdateCard({ update, selectedCategory = "All", commentCount = 0 }: UpdateCardProps) {
+export default function UpdateCard({ update, selectedCategory = "All", commentCount = 0, onDiscussClick }: UpdateCardProps) {
   const isSuperseded = update.status === "superseded";
   const summary = extractSummary(update.body);
   const isTruncated = update.body.length > summary.length;
@@ -70,9 +72,19 @@ export default function UpdateCard({ update, selectedCategory = "All", commentCo
         <Link to={`/update/${update.id}`} state={{ fromCategory: selectedCategory }} className="btn btn-primary">
           View
         </Link>
-        <Link to={`/update/${update.id}#comments`} state={{ fromCategory: selectedCategory }} className="btn btn-secondary">
-          Discuss
-        </Link>
+        {onDiscussClick ? (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => onDiscussClick(update.id)}
+          >
+            Discuss
+          </button>
+        ) : (
+          <Link to={`/update/${update.id}#comments`} state={{ fromCategory: selectedCategory }} className="btn btn-secondary">
+            Discuss
+          </Link>
+        )}
       </div>
     </div>
   );

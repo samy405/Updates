@@ -2,9 +2,11 @@ import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import type { Update, UpdateCategory, UpdatesData } from "../types";
 import UpdateCard from "../components/UpdateCard";
+import UpdateDetailWithComments from "../components/UpdateDetailWithComments";
 import { setPageMeta } from "../utils/pageMeta";
 import { supabase } from "../utils/supabaseClient";
 import "./Home.css";
+import "./UpdatePage.css";
 
 const CATEGORIES: UpdateCategory[] = [
   "Pharmacy",
@@ -34,6 +36,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [panelUpdateId, setPanelUpdateId] = useState<string | null>(null);
 
   useEffect(() => {
     setPageMeta({
@@ -175,6 +178,20 @@ export default function Home() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const openDiscussPanel = (updateId: string) => setPanelUpdateId(updateId);
+  const closeDiscussPanel = () => setPanelUpdateId(null);
+
+  const panelUpdate = panelUpdateId ? allUpdates.find((u) => u.id === panelUpdateId) : null;
+
+  useEffect(() => {
+    if (!panelUpdateId) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeDiscussPanel();
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [panelUpdateId]);
 
   const toggleDate = (date: string) => {
     const newExpanded = new Set(expandedDates);
@@ -339,7 +356,13 @@ export default function Home() {
                       return 0;
                     })
                     .map((update) => (
-                      <UpdateCard key={update.id} update={update} selectedCategory={selectedCategory} commentCount={commentCounts[update.id] ?? 0} />
+                      <UpdateCard
+                        key={update.id}
+                        update={update}
+                        selectedCategory={selectedCategory}
+                        commentCount={commentCounts[update.id] ?? 0}
+                        onDiscussClick={openDiscussPanel}
+                      />
                     ))}
                 </div>
               )}
@@ -348,7 +371,7 @@ export default function Home() {
           </>
         )}
       </div>
-      <button 
+<button
         className={`scroll-to-top ${showScrollTop ? "visible" : ""}`}
         onClick={scrollToTop}
         aria-label="Scroll to top"
@@ -356,6 +379,43 @@ export default function Home() {
       >
         ↑
       </button>
+
+      {/* Discuss side panel */}
+      <div
+        className={`discuss-panel-backdrop ${panelUpdateId ? "discuss-panel-backdrop--open" : ""}`}
+        onClick={closeDiscussPanel}
+        role="presentation"
+        aria-hidden={!panelUpdateId}
+        aria-label="Close panel"
+      />
+      <aside
+        className={`discuss-panel ${panelUpdateId ? "discuss-panel--open" : ""}`}
+        aria-label="Update detail and comments"
+        aria-hidden={!panelUpdateId}
+      >
+        <div className="discuss-panel-inner">
+          <div className="discuss-panel-header">
+            <h2 className="discuss-panel-title">Discuss</h2>
+            <button
+              type="button"
+              className="discuss-panel-close"
+              onClick={closeDiscussPanel}
+              aria-label="Close panel"
+            >
+              ×
+            </button>
+          </div>
+          <div className="discuss-panel-body">
+            {panelUpdate && (
+              <UpdateDetailWithComments
+                update={panelUpdate}
+                updates={allUpdates}
+                compact
+              />
+            )}
+          </div>
+        </div>
+      </aside>
     </div>
   );
 }

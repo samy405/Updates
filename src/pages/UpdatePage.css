@@ -87,6 +87,20 @@
   z-index: 2;
 }
 
+.update-detail-content--compact .update-header h1 {
+  font-size: 1.5rem;
+}
+
+.update-detail-content--compact .update-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+}
+
+.update-detail-content--compact .update-body h2,
+.update-detail-content--compact .update-comments h2 {
+  font-size: 1.25rem;
+}
+
 :root[data-theme="dark"] .update-content {
   background: rgba(30, 41, 59, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.18);
